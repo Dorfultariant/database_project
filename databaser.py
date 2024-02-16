@@ -17,7 +17,7 @@ def initDB():
 
 def menu():
     print()
-    print("### MENU OPTIONS ###")
+    print("##### MENU OPTIONS #####")
     print("1) List Books")
     print("2) List Authors")
     print("3) List Publishers")
@@ -26,12 +26,45 @@ def menu():
     print()
     print("6) List Member Loans")
     print("7) Find Books")
+    print()
+    print("8) Insert Book")
+    print("9) Insert Member")
+    print()
+    print("10) Loan Book")
+    print("11) Return Book")
+    print()
+    print("12) Remove Book")
+    print("13) Remove Member")
     
-
     print("Your selection: ", end="")
     userIn = input()
     
     return userIn
+
+
+def insertBook():
+    return
+
+
+def insertMember():
+    return
+
+
+def loanBook():
+    return
+
+
+def returnBook():
+    return
+
+
+def removeBook():
+    return
+
+
+def removeMember():
+    return
+
 
 def listTableContent(userIn):
     print("Data found:")
