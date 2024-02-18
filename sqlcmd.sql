@@ -19,7 +19,7 @@ create table Loan (
 create table Book (
         book_id INTEGER PRIMARY KEY NOT NULL,
         title VARCHAR(100) NOT NULL,
-        isbn VARCHAR(20) NOT NULL UNIQUE CHECK(LENGTH(isbn) IN (10, 13)),
+        isbn VARCHAR(20) NOT NULL CHECK(LENGTH(isbn) IN (10, 13)),
         publish_date VARCHAR(50),
         loan_status BOOL NOT NULL DEFAULT FALSE,
         fk_author_id INTEGER,
