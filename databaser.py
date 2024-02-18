@@ -1,3 +1,4 @@
+## This program utilizes template python program given in the Week task Topic 6
 import sqlite3 as sq
 db = sq.connect("prokkis.db")
 cur = db.cursor()
@@ -8,12 +9,18 @@ def initDB():
         command = ""
         for l in f.readlines():
             command += l
-
+        print("Creation successful")
+        print(command)
         cur.executescript(command)
+        cur.commit()
+
     except sq.OperationalError:
         print("DB exists, init skip")
     except:
-        print("Oh no! .sql not found.")
+        print("Oh no! .sql not found.. or something else is off")
+    return
+
+
 
 def menu():
     print()
@@ -135,8 +142,10 @@ def main():
             print("Try again.")
                 
         print()
+        
+    db.close()
 
-    return 0;
+    return
 
 main()
 
