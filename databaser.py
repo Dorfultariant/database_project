@@ -43,6 +43,46 @@ def menu():
 
 
 def insertBook():
+    print("You want to insert book? Nice!")
+    title =         input("Book name?: ")
+    isbn =          input("ISBN?: ")
+    publishDate =   input("publish date? MM/DD/YYYY: ")
+    author =        input("Author? (firstname surname): ")
+    publisher =     input("Publisher: ")
+
+    if (len(isbn) != 10 and len(isbn) != 13):
+        input("ISBN number was incorrect. Press enter to continue")
+        return
+    
+    cmd = f"SELECT * FROM Publisher WHERE publisher_name = '{publisher}'"
+    publisherData = cur.execute(cmd)
+    row = publisherData.fetchone()
+    if row != None:
+        publisherID = row[0]
+        print("publisherID:",publisherID)
+    else:
+        print("Publisher is not in database.")
+        print("Give adress for publisher: ",end="")
+        address = input()
+        print("Give e-mail for publisher: ",end="")
+        email = input()
+        cmd = f"INSERT INTO Publisher (publisher_name,address,email) VALUES ('{publisher}','{address}','{email}')"
+        cur.execute(cmd)
+        cur.execute(f"SELECT * from publisher where publisher_name = '{publisher}'")
+        publisherData = cur.fetchone()
+        publisherID = publisherData[0]
+        print(cur.fetchone())
+
+    print()
+    author_id = 123124141341234134
+    cmd = f"INSERT INTO book (title, isbn, publish_date,fk_author_id,fk_publisher_id) VALUES ('{title}','{isbn}','{publishDate}',{author_id},{publisherID})"
+    cur.execute(cmd)   
+    cmd = f"SELECT * from book where title = '{title}'"
+    addedData = cur.execute(cmd)
+    if addedData:
+        print("Following data is added to database.\n",addedData.fetchone())
+        db.commit()
+    print()
     return
 
 
@@ -128,15 +168,15 @@ def main():
         elif (userIn == "7"):
             findBooks()
         elif (userIn == "8"):
-            print("Seppo")
+            insertBook()
         elif (userIn == "0"):
             print("Kiitos Ohjelman Käytöstä!")
         else:
             print("Try again.")
                 
-        print()
+        input("Press enter to continue")
 
-    return 0;
+    return 0
 
 main()
 
