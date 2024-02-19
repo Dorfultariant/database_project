@@ -12,7 +12,7 @@ create table Loan (
         loan_date VARCHAR(100) NOT NULL,
         due_date VARCHAR(100) NOT NULL,
         return_date VARCHAR(25),
-        fk_member_id INT NOT NULL,
+        fk_member_id INTEGER NOT NULL,
         FOREIGN KEY (fk_member_id) REFERENCES Member(member_id) ON DELETE CASCADE
 );
 
@@ -20,17 +20,18 @@ create table Book (
         book_id INTEGER PRIMARY KEY NOT NULL,
         title VARCHAR(100) NOT NULL,
         isbn VARCHAR(20) NOT NULL CHECK(LENGTH(isbn) IN (10, 13)),
+        isbn VARCHAR(20) NOT NULL CHECK(LENGTH(isbn) IN (10, 13)),
         publish_date VARCHAR(50),
         loan_status BOOL NOT NULL DEFAULT FALSE,
-        fk_author_id INT,
-        fk_publisher_id INT,
+        fk_author_id INTEGER,
+        fk_publisher_id INTEGER,
         FOREIGN KEY (fk_author_id) REFERENCES Author(author_id) ON DELETE CASCADE,
         FOREIGN KEY (fk_publisher_id) REFERENCES Publisher(publisher_id) ON DELETE CASCADE
 );
 
 create table BooksInLoan (
-        fk_book_id INT NOT NULL,
-        fk_loan_id INT NOT NULL,
+        fk_book_id INTEGER NOT NULL,
+        fk_loan_id INTEGER NOT NULL,
         FOREIGN KEY (fk_book_id) REFERENCES Book(book_id) ON DELETE CASCADE,
         FOREIGN KEY (fk_loan_id) REFERENCES Loan(loan_id) ON DELETE CASCADE
 );
@@ -41,8 +42,8 @@ create table Genre (
 );
 
 create table GenresOfBook (
-        fk_book_id INT NOT NULL,
-        fk_genre_id INT NOT NULL,
+        fk_book_id INTEGER NOT NULL,
+        fk_genre_id INTEGER NOT NULL,
         FOREIGN KEY (fk_book_id) REFERENCES Book(book_id) ON DELETE CASCADE,
         FOREIGN KEY (fk_genre_id) REFERENCES Genre(genre_id) ON DELETE CASCADE
 );
@@ -110,6 +111,7 @@ insert into Publisher (publisher_id, publisher_name, address, email) values (500
 insert into Publisher (publisher_id, publisher_name, address, email) values (5002, 'Jetpulse', '9084 Marcy Terrace', 'tdickin2@google.com.br');
 insert into Publisher (publisher_id, publisher_name, address, email) values (5003, 'Divanoodle', '714 Sullivan Plaza', 'bgeratasch3@jigsy.com');
 insert into Publisher (publisher_id, publisher_name, address, email) values (5004, 'Mynte', '68538 Garrison Circle', 'sewence4@rambler.ru');
+insert into Publisher (publisher_id, publisher_name, address, email) values (5005, 'Testi', '68538 Garrison Circle', 'sewence4@rambler.ru');
 
 insert into Loan (loan_id, loan_date, due_date, fk_member_id) values (6000, '11/25/3153', '5/11/4111'       , 1000  );
 insert into Loan (loan_id, loan_date, due_date, fk_member_id) values (6001, '6/22/4246', '11/29/4815'       , 1000  );
