@@ -1,6 +1,5 @@
 create table Member (
         member_id INTEGER PRIMARY KEY NOT NULL,
-        member_id INTEGER PRIMARY KEY NOT NULL,
         first_name VARCHAR(100) NOT NULL,
         last_name VARCHAR(100) NOT NULL,
         address VARCHAR(100) NOT NULL,
@@ -10,7 +9,6 @@ create table Member (
 
 create table Loan (
         loan_id INTEGER PRIMARY KEY NOT NULL,
-        loan_id INTEGER PRIMARY KEY NOT NULL,
         loan_date VARCHAR(100) NOT NULL,
         due_date VARCHAR(100) NOT NULL,
         return_date VARCHAR(25),
@@ -19,7 +17,6 @@ create table Loan (
 );
 
 create table Book (
-        book_id INTEGER PRIMARY KEY NOT NULL,
         book_id INTEGER PRIMARY KEY NOT NULL,
         title VARCHAR(100) NOT NULL,
         isbn VARCHAR(20) NOT NULL CHECK(LENGTH(isbn) IN (10, 13)),
@@ -41,7 +38,6 @@ create table BooksInLoan (
 
 create table Genre (
         genre_id INTEGER PRIMARY KEY NOT NULL,
-        genre_id INTEGER PRIMARY KEY NOT NULL,
         genre_name VARCHAR(50) NOT NULL
 );
 
@@ -53,7 +49,6 @@ create table GenresOfBook (
 );
 
 create table Author (
-        author_id INTEGER PRIMARY KEY NOT NULL,
         author_id INTEGER PRIMARY KEY NOT NULL,
         author_firstname VARCHAR(70),
         author_surname VARCHAR(70),
