@@ -1,4 +1,4 @@
 mockData/
 tables.sql
 lib_tables.sql
-prokkis.db
+*.db
