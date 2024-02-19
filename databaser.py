@@ -138,6 +138,34 @@ def insertBook():
 
 
 def insertMember():
+    print("You are adding member to database.")
+    memberFirstName = input("Insert first name: ")
+    memberSurname = input("Insert surname: ")
+    memberAddress = input("Insert home adress: ")
+    memberPhoneNumber = input("Insert phone number: ")
+    memberEmail = input("insert email: ")
+    print()
+    memberData = (memberFirstName,memberSurname,memberAddress,memberPhoneNumber,memberEmail)
+    print("You are adding:")
+    for i in memberData:
+        print(i)
+    if input("Is this correct? y/n").capitalize() == "Y":
+        insertcmd = f"INSERT INTO Member (first_name,last_name,address,phone_number,email) VALUES ('{memberFirstName}','{memberSurname}','{memberAddress}','{memberPhoneNumber}','{memberEmail}')"
+        testiinsertti = cur.execute(insertcmd)
+        print("testiinsertti",testiinsertti.fetchall())
+        cmd = f"SELECT first_name,last_name,address,phone_number,email FROM Member WHERE first_name = '{memberFirstName}' and last_name = '{memberSurname}' and address = '{memberAddress}' and phone_number = '{memberPhoneNumber}' and email = '{memberEmail}'"
+        insertedData = cur.execute(cmd)
+        row = insertedData.fetchone()
+
+        if memberData == row:   #tests that information is inserted correctly to members
+            db.commit()
+            print("Member inserted to database!")
+        else:
+            print("Something went wrong inputting member to database. Rollback.")
+            db.rollback()
+    else:
+        print("Returning back to menu.")
+        
     return
 
 def listLoans():
@@ -295,6 +323,8 @@ def main():
             findBooks()
         elif (userIn == "8"):
             insertBook()
+        elif (userIn == "9"):
+            insertMember()
         elif (userIn == "10"):
             loanBook()
         elif (userIn == "0"):
