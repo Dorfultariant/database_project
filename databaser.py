@@ -67,7 +67,7 @@ def insertBook():
         print("To stop insert 0")
         genreInput = input("Insert genre number: ")
         if genreInput.isdigit() and int(genreInput) <= len(dbgenres) and int(genreInput) > 0:
-            print("LASKGNALKGFNADFKLNGKLF")
+            #print("LASKGNALKGFNADFKLNGKLF")
             genreInput = int(genreInput)-1
             genres.add(dbgenres[genreInput][0])
         
@@ -298,14 +298,15 @@ def main():
         elif (userIn == "10"):
             loanBook()
         elif (userIn == "0"):
-            print("Kiitos Ohjelman Käytöstä!")
+            continue
         else:
             print("Try again.")
                 
         input("Press enter to continue")
     
     db.close()
-    
+    print()
+    print("Kiitos Ohjelman Käytöstä!")
     return 0
 
 main()

@@ -20,7 +20,6 @@ create table Book (
         book_id INTEGER PRIMARY KEY NOT NULL,
         title VARCHAR(100) NOT NULL,
         isbn VARCHAR(20) NOT NULL CHECK(LENGTH(isbn) IN (10, 13)),
-        isbn VARCHAR(20) NOT NULL CHECK(LENGTH(isbn) IN (10, 13)),
         publish_date VARCHAR(50),
         loan_status BOOL NOT NULL DEFAULT FALSE,
         fk_author_id INTEGER,
@@ -111,7 +110,7 @@ insert into Publisher (publisher_id, publisher_name, address, email) values (500
 insert into Publisher (publisher_id, publisher_name, address, email) values (5002, 'Jetpulse', '9084 Marcy Terrace', 'tdickin2@google.com.br');
 insert into Publisher (publisher_id, publisher_name, address, email) values (5003, 'Divanoodle', '714 Sullivan Plaza', 'bgeratasch3@jigsy.com');
 insert into Publisher (publisher_id, publisher_name, address, email) values (5004, 'Mynte', '68538 Garrison Circle', 'sewence4@rambler.ru');
-insert into Publisher (publisher_id, publisher_name, address, email) values (5005, 'Testi', '68538 Garrison Circle', 'sewence4@rambler.ru');
+insert into Publisher (publisher_id, publisher_name, address, email) values (5005, 'Testi', '68538 Garrison Circle', 'sewence2@rambler.ru');
 
 insert into Loan (loan_id, loan_date, due_date, fk_member_id) values (6000, '11/25/3153', '5/11/4111'       , 1000  );
 insert into Loan (loan_id, loan_date, due_date, fk_member_id) values (6001, '6/22/4246', '11/29/4815'       , 1000  );
