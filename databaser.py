@@ -14,8 +14,7 @@ def initDB():
         ##print("Creation successful")
         ##print(command)
         cur.executescript(command)
-
-
+    
     except sq.OperationalError:
         print("DB exists, init skip")
     except:
@@ -44,7 +43,7 @@ def menu():
     print()
     print("12) Remove Book")
     print("13) Remove Member")
-    
+
     print("Your selection: ", end="")
     userIn = input()
     
@@ -67,7 +66,6 @@ def insertBook():
         print("To stop insert 0")
         genreInput = input("Insert genre number: ")
         if genreInput.isdigit() and int(genreInput) <= len(dbgenres) and int(genreInput) > 0:
-            #print("LASKGNALKGFNADFKLNGKLF")
             genreInput = int(genreInput)-1
             genres.add(dbgenres[genreInput][0])
         
@@ -253,10 +251,101 @@ def loanBook():
         else:
             print("Could not loan book, try again")
         bookIn = input("Which book would you like to loan (end transaction with 0): ")
-
     return
 
-def returnBook():
+def returnBook(*args):
+    loan_ids = []
+    returnLoan = False
+    splitted = []
+    
+    if len(args) == 0:
+        listTableContent("5")
+        userIn = input("Which user is returning the book (give member_id): ")
+        cmd = f"select * from member where member_id = ?;"
+        cur.execute(cmd, (userIn,))
+        user = cur.fetchone()
+        if not user:
+            print("User not found. Abort!")
+            return
+        user_id = user[0]
+        print()
+    
+
+        cmd = 'select * from Loan_view where "Member id" = ?;'
+        cur.execute(cmd, (user_id,))
+        rows = cur.fetchall()
+
+        cols = [c[0] for c in cur.description]
+        col_width = [9, 9, 10, 10, 9, 50]
+        head = " | ".join(n.ljust(w) for n, w in zip(cols, col_width))
+        print(head)
+        for r in rows:
+            print(" | ".join(str(item).ljust(w) for item, w in zip(r, col_width)))
+        print()
+        
+        userIn = input("Return books by 'Book id' or 'a, Loan id' for all in loan (0 to exit): ")
+        splitted = [i.strip() for i in userIn.split(",")]
+
+        if "0" in splitted:
+            return
+        if len(splitted) < 1:
+            return
+    else:
+        user_id = args[0]
+        returnLoan = True
+        cmd = "select loan_id from Loan where fk_member_id = ?;"
+        cur.execute(cmd, (user_id,))
+        res = cur.fetchall()
+        #print(res)
+        for r in res:
+            loan_ids.append(r[0])
+        print(loan_ids)
+        
+    books_to_return = []
+    for com in splitted:
+        if returnLoan:
+            loan_ids.append(int(com))
+
+        if com == "a":
+            returnLoan = True
+            continue
+        else:
+            books_to_return.append(int(com))
+
+    
+    if not returnLoan:
+        for book_id in books_to_return:
+            try:
+                cmd = "update Book set loan_status = 0 where book_id = ?;"
+                cur.execute(cmd, (book_id,))
+                cmd = "delete from BooksInLoan where fk_book_id = ?;"
+                cur.execute(cmd, (book_id,))
+            except sq.OperationalError as e:
+                print("Could not return books")
+                print(e)
+                return              
+        db.commit()
+        return
+
+    for loan_id in loan_ids:
+        try:
+            cmd = "select fk_book_id from BooksInLoan where fk_loan_id = ?;"
+            cur.execute(cmd,(loan_id,))
+            book_ids = cur.fetchall()
+            for i in book_ids:
+                cmd = "update Book set loan_status = 0 where book_id = ?;"
+                cur.execute(cmd, i)
+            
+            cmd = "delete from BooksInLoan where fk_loan_id = ?;"
+            cur.execute(cmd, (loan_id,))
+            cmd = "delete from Loan where loan_id = ?;"
+            cur.execute(cmd, (loan_id,))
+            db.commit()
+
+        except sq.OperationalError as e:
+            print("Could not return loan")
+            print(e)
+            
     return
 
 
@@ -267,11 +356,9 @@ def removeBook():
 def removeMember():
     return
 
-
 def listTableContent(userIn):
-    print("Data found:")
-    if userIn == "1":
-        cmd = "SELECT * FROM Book"
+    if (userIn == "1"):
+        cmd = "SELECT * FROM Book;"
     elif (userIn == "2"):
         cmd = "SELECT * FROM Author;"
     elif (userIn == "3"):
@@ -314,21 +401,38 @@ def main():
 
     userIn = -1
     while(userIn != "0"):
-        userIn = menu()
-        if (userIn in ["1", "2", "3","4","5"]):
+        userIn = menu() 
+        ## List Books, Authors, Publishers, Genres, Members 
+        if   (userIn in ["1", "2", "3","4","5"]):
             listTableContent(userIn) 
+
         elif (userIn == "6"):
             listLoans()
+
         elif (userIn == "7"):
             findBooks()
+        
         elif (userIn == "8"):
             insertBook()
+        
         elif (userIn == "9"):
             insertMember()
+        
         elif (userIn == "10"):
             loanBook()
+
+        elif (userIn == "11"):
+            returnBook()
+
+        elif (userIn == "12"):
+            removeBook()
+
+        elif (userIn == "13"):
+            removeMember()
+    
         elif (userIn == "0"):
             continue
+        
         else:
             print("Try again.")
                 
@@ -340,4 +444,3 @@ def main():
     return 0
 
 main()
-
