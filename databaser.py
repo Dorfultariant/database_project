@@ -286,10 +286,10 @@ def returnBook(*args):
             print(" | ".join(str(item).ljust(w) for item, w in zip(r, col_width)))
         print()
         
-        userIn = input("Return books by 'Book id' or 'a, Loan id' for all in loan (0 to exit): ")
+        userIn = input("Return books by 'Book id' or 'a, Loan id' for all in loan (0 or enter to exit): ")
         splitted = [i.strip() for i in userIn.split(",")]
 
-        if "0" in splitted:
+        if "0" in splitted or '' in splitted:
             return
         if len(splitted) < 1:
             return
