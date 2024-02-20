@@ -61,6 +61,17 @@ create table Publisher (
         email VARCHAR(50) UNIQUE
 );
 
+create view Loan_view as 
+        select Member.member_id as "Member id", 
+        Loan.loan_id as "Loan id", 
+        Loan.loan_date as "Loan Date", 
+        Loan.due_date as "Due Date", 
+        Book.book_id as "Book id", 
+        Book.title as "Book title" 
+        from Loan
+        join Member on Loan.fk_member_id = Member.member_id
+        join BooksInLoan on BooksInLoan.fk_loan_id = Loan.loan_id
+        join Book on Book.book_id = BooksInLoan.fk_book_id;
 
 insert into Member (member_id, first_name, last_name, address, phone_number, email) values (1000,'Land', 'Witling', '88 Gulseth Hill', '962-756-5469', 'lwitling0@webs.com');
 insert into Member (member_id, first_name, last_name, address, phone_number, email) values (1001,'Claudian', 'Runciman', '0562 Quincy Park', '795-238-0413', 'crunciman1@meetup.com');
