@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 db = sq.connect("prokkis.db")
 cur = db.cursor()
+cur.execute("PRAGMA foreign_keys = ON;")
 
 def initDB():
     try:
@@ -391,8 +392,11 @@ def inputFromSQL():
 
 
 def deleteAuthor(): #69
-    cmd = f"DELETE FROM Author WHERE author_id = 4005"
+    print(cur.execute("SELECT * FROM booksinloan").fetchall())
+    cmd = f"DELETE FROM author WHERE author_id = 4000"
     cur.execute(cmd)
+    print(cur.execute("SELECT * FROM booksinloan").fetchall())
+    # db.commit()
     return
 
 def main():
