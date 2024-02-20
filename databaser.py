@@ -16,8 +16,8 @@ def initDB():
         ##print(command)
         cur.executescript(command)
     
-    except sq.OperationalError:
-        print("DB exists, init skip")
+    except sq.OperationalError as x:
+        print("DB exists, init skip", x)
     except:
         print("Oh no! .sql not found.. or something else is off")
     return
@@ -422,24 +422,37 @@ def listTableContent(userIn):
 
 
 def findBooks():
+    db.row_factory = sq.Row
+    cur2 = db.cursor()
     print()
-    print("1: Title")
-    print("2: Genre")
-    print("3: Author")
-    print("4: Publisher")
-    print("Select filter: ", end="")
-    opt = input()
-    print("Give search term: ", end="")
-    sterm = input()
-    cmd = ""
-    if (opt == "1"):
-        cmd = ""
-    elif (opt == "2"):
-        print(sterm, "2")
+    print()
+    types = {"0":"title","1":"genre","2":"publisher","3":"released","4":"loaned"}
+    userIn1 = "11"
+    while userIn1 not in types.keys():
+        for c,i in enumerate(types):
+            print(f"{c}: {types[i]}")
+        userIn1 = input("Search parameter: ")
+    userIn1 = types[userIn1]
+    print()
+    tempList = set()
+    if userIn1 not in ["title","loaned"]:
+        for i in cur2.execute(f"SELECT {userIn1} from BooksByTitle").fetchall():
+            i = i[0]
+            i = i.split(",")
+            for j in i:
+                tempList.add(j)
+        for i in tempList:
+            print(i)
+        userIn2 = input(f"Following {userIn1} are available. Type in search keyword: ")
+    elif userIn1 == "loaned":
+        userIn2 = "1"
     else:
-        print("Could not find books with given parameters.")
-        return
-    sq.execute(cmd)
+        userIn2 = input("Give search word: ")
+    booksByTitle = cur2.execute(f"Select * from BooksByTitle where {userIn1} like '%{userIn2}%'").fetchall()
+    print()
+    print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |\n{:s}".format("Title","Genre","Author","Publisher","Released","Loaned","-"*118))
+    for j in booksByTitle:
+        print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |".format(j["Title"][:30],j["Genre"][:24],j["Author"][:20],j["Publisher"],j["Released"][:10].replace("/","."),j["Loaned"]))
     return
 
 def inputFromSQL():
