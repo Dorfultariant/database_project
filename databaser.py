@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 db = sq.connect("prokkis.db")
 cur = db.cursor()
+cur.execute("PRAGMA foreign_keys = ON;")
 
 def initDB():
     try:
@@ -43,6 +44,8 @@ def menu():
     print()
     print("12) Remove Book")
     print("13) Remove Member")
+    print()
+    print("14) Input from sql file")
 
     print("Your selection: ", end="")
     userIn = input()
@@ -252,6 +255,7 @@ def loanBook():
         bookIn = input("Which book would you like to loan (end transaction with 0): ")
     return
 
+
 def returnBook(*args):
     loan_ids = []
     returnLoan = False
@@ -349,10 +353,54 @@ def returnBook(*args):
 
 
 def removeBook():
+    print()
+    searchParameter = input("Search parameter for deleting book: ")
+    bookcmd = f"SELECT * FROM Book WHERE title LIKE '%{searchParameter}%'"
+    books = cur.execute(bookcmd)
+    for book in books:
+        print(book)
+    print()
+    bookID = input("Give book id you want to delete: ")
+    if bookID == "":
+        print("Returning to menu.")
+        return
+    book = cur.execute(f"SELECT title from Book WHERE book_id = {bookID}").fetchone()
+    userIn = input(f"Are you sure you want to delete {book} ")
+    if userIn.capitalize() == "Y":
+        cmd = f"DELETE FROM Book WHERE book_id = {bookID}"
+        returnBook(bookID)
+        cur.execute(cmd)
+        print("Book deleted!")
+        db.commit()
+    else:
+        db.rollback()
     return
 
 
 def removeMember():
+    print()
+    searchParameter = input("Give surname you want to search: ")
+    userscmd = f"SELECT * FROM Member WHERE last_name LIKE '%{searchParameter}%'"
+    users = cur.execute(userscmd)
+    for user in users.fetchall():
+        print(user)
+    print()
+    userID = input("Give user id you want to delete: ")
+    if userID == "":
+        print("Returning to menu.")
+        return
+    user = cur.execute(f"SELECT first_name,last_name from Member WHERE member_id = {userID}").fetchone()
+    userIn = input(f"Are you sure you want to delete {user} ")
+    if userIn.capitalize() == "Y":
+        cmd = f"DELETE FROM Member WHERE member_id = {userID}"
+        cur.execute(cmd)
+        print("User deleted!")
+        returnBook(userID)
+        print("User books returned.")
+        db.commit()
+    else:
+        db.rollback()
+        
     return
 
 def listTableContent(userIn):
@@ -393,7 +441,51 @@ def findBooks():
     sq.execute(cmd)
     return
 
+def inputFromSQL():
+    fName = input("Give sql filename: ")
+    try:
+        f = open(fName, "r")
+        command = ""
+        addedData = []
+        for l in f.readlines():
+            command += l
+            if command.endswith(";\n") or command.endswith(";"):
+                cur.execute(command)
+                addedData.append(command)
+                command = ""
 
+    except sq.OperationalError as x:
+        print(x)
+        db.rollback()
+    except sq.DatabaseError as x:
+        print(x)
+        db.rollback()
+    except sq.Error as x:
+        print("Oh no! .sql not found.. or something else is off",x)
+        db.rollback()
+    except:
+        print("something went wrong. Rolling back.")
+        db.rollback()
+    print("This data is inputted.")
+    for i in addedData:
+        print(i,end="")
+    print()
+    if input("Are you sure you wanto to save this data? y/n: ").capitalize() == "Y":
+        db.commit()
+        print("Data saved to database.")
+    else:
+        print("Data roll backed.")
+        db.rollback()
+    return
+
+
+def deleteAuthor(): #69
+    print(cur.execute("SELECT * FROM booksinloan").fetchall())
+    cmd = f"DELETE FROM author WHERE author_id = 4000"
+    cur.execute(cmd)
+    print(cur.execute("SELECT * FROM booksinloan").fetchall())
+    # db.commit()
+    return
 
 def main():
     initDB()
@@ -428,7 +520,13 @@ def main():
 
         elif (userIn == "13"):
             removeMember()
-    
+            
+        elif (userIn == "14"):
+            inputFromSQL()
+            
+        elif (userIn == "69"):
+            deleteAuthor()
+
         elif (userIn == "0"):
             continue
         
