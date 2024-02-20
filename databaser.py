@@ -117,7 +117,6 @@ def insertBook():
         publisherData = cur.fetchone()
         publisherID = publisherData[0]
 
-
     print()
     cmd = f"INSERT INTO book (title, isbn, publish_date,fk_author_id,fk_publisher_id) VALUES ('{title}','{isbn}','{publishDate}',{authorID},{publisherID})"
     cur.execute(cmd)   
