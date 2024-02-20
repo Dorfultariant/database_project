@@ -73,6 +73,20 @@ create view Loan_view as
         join BooksInLoan on BooksInLoan.fk_loan_id = Loan.loan_id
         join Book on Book.book_id = BooksInLoan.fk_book_id;
 
+create view BooksByTitle as
+        select book.title as "Title",
+        group_concat(Genre.genre_name,",") as "Genre",
+        author.author_firstname || " " || author.author_surname as "Author",
+        publisher.publisher_name as "Publisher",
+        book.publish_date as "Released",
+        book.loan_status as "Loaned"
+        from book
+        join author on author.author_id = book.fk_author_id
+        join publisher on publisher.publisher_id = book.fk_publisher_id
+        join GenresOfBook on GenresOfBook.fk_book_id = book.book_id
+        join genre on genre.genre_id = GenresOfBook.fk_genre_id
+        group By book.title;
+
 insert into Member (member_id, first_name, last_name, address, phone_number, email) values (1000,'Land', 'Witling', '88 Gulseth Hill', '962-756-5469', 'lwitling0@webs.com');
 insert into Member (member_id, first_name, last_name, address, phone_number, email) values (1001,'Claudian', 'Runciman', '0562 Quincy Park', '795-238-0413', 'crunciman1@meetup.com');
 insert into Member (member_id, first_name, last_name, address, phone_number, email) values (1002,'Mair', 'Wolfarth', '460 Johnson Park', '597-488-0051', 'mwolfarth2@networkadvertising.org');
