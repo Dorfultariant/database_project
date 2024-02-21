@@ -272,7 +272,7 @@ def returnBook(*args):
             return
         user_id = user[0]
         print()
-    
+
 
         cmd = 'select * from Loan_view where "Member id" = ?;'
         cur.execute(cmd, (user_id,))
@@ -303,7 +303,8 @@ def returnBook(*args):
         for r in res:
             loan_ids.append(r[0])
         print(loan_ids)
-        
+
+
     books_to_return = []
     for com in splitted:
         if returnLoan:
@@ -402,6 +403,7 @@ def removeMember():
         db.rollback()
         
     return
+
 
 def listTableContent(userIn):
     if (userIn == "1"):
