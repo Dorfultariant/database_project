@@ -2,3 +2,4 @@ mockData/
 tables.sql
 lib_tables.sql
 *.db
+*.docx
