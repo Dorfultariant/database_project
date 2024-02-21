@@ -72,8 +72,7 @@ def insertBook():
             genreInput = int(genreInput)-1
             genres.add(dbgenres[genreInput][0])
         
-            
-        
+
     print(genres)
     isbn = input("ISBN?: ")
     if (len(isbn) != 10 and len(isbn) != 13):
@@ -165,192 +164,186 @@ def insertMember():
             db.rollback()
     else:
         print("Returning back to menu.")
-        
     return
 
-def listLoans():
-    print()
-    print("#### LOANS ####")
-    print()
-    cmd = "select * from member;"
-    cur.execute(cmd)
-    for m in cur.fetchall():
-        print(m)
-    userIn = input("Which users' loans you want to see (insert member_id): ")
-    cmd = f"select * from member where member_id like '%{userIn}%';"
-    cur.execute(cmd)
+
+def findMemberByID():
+    printTable("Member")
+    userIn = input("Give Member ID: ")
+
+    cmd = f"SELECT * FROM Member WHERE member_id = ?;"
+    cur.execute(cmd, (userIn,))
     user = cur.fetchone()
     if not user:
         print("User not found. Abort!")
         return
     user_id = user[0]
-    cmd = f"""select Member.first_name, Member.last_name, Loan.loan_date, Loan.due_date, GROUP_CONCAT(Book.title)
-                from Member
-                join Loan on Member.member_id = Loan.fk_member_id
-                join BooksInLoan on Loan.loan_id = BooksInLoan.fk_loan_id
-                join Book on BooksInLoan.fk_book_id = Book.book_id
-                where Member.member_id = {user_id}
-                group by Loan.loan_id;"""
-    cur.execute(cmd)
-    for l in cur.fetchall():
-        print(l)
+    print()
+    return user_id
 
+
+def listLoans():
+    print()
+    print("##### LOANS #####")
+    print()
+ 
+    user_id = findMemberByID()
+    cmd = """SELECT * FROM LoanView WHERE "Member id" = ?;"""
+    cur.execute(cmd, (user_id,))
+    printTable()
+    
     return
 
 
 def loanBook():
+    user_id = findMemberByID()
 
-    cmd = "select * from member;"
-    cur.execute(cmd)
-    for m in cur.fetchall():
-        print(m)
-
-    userIn = input("Which user is loaning the book (give member_id): ")
-    cmd = f"select * from member where member_id like '%{userIn}%';"
-    cur.execute(cmd)
-    user = cur.fetchone()
-    if not user:
-        print("User not found. Abort!")
-        return
-    user_id = user[0]
-
-    cmd = """select Book.title, Author.author_firstname, Author.author_surname, Publisher.publisher_name 
-             from Book 
-             join Author on Book.fk_author_id = Author.author_id 
-             join Publisher on Book.fk_publisher_id = Publisher.publisher_id 
-             where Book.loan_status = 0;""" 
+    cmd = """SELECT * FROM BooksByTitle WHERE "Loaned" = 0;"""
     print("Available books:")
     cur.execute(cmd)
-
-    for book in cur.fetchall():
-        print(book)
+    printTable()
     
-    book_id = None
-
     loan_date = datetime.now().strftime("%m/%d/%Y")
     due_date = (datetime.now() + timedelta(days = 14)).strftime("%m/%d/%Y")
     
-    cmd = f"insert into loan (loan_date, due_date, fk_member_id) values ('{loan_date}','{due_date}','{user_id}');"
+    cmd = f"INSERT INTO loan (loan_date, due_date, fk_member_id) VALUES ('{loan_date}','{due_date}','{user_id}');"
     cur.execute(cmd)
     last_loan_id = cur.lastrowid
 
-    bookIn = input("Which book would you like to loan (end transaction with 0): ")
-    while (bookIn != "0"):
-
-        cmd = f"select * from Book where title like '%{bookIn}%' and loan_status = 0;"
-    
-        cur.execute(cmd)
+    bookIn = input("Loan Book by Title (0 or enter to exit): ")
+    while (bookIn != "0" and bookIn != ""):
+        cmd = f"SELECT * FROM Book WHERE title = ? AND loan_status = 0;"
+        cur.execute(cmd, (bookIn,))
         book = cur.fetchone()
-        
         if book:
             book_id = book[0]
-            cmd = f"insert into booksinloan (fk_book_id, fk_loan_id) values ({book_id}, {last_loan_id});"
+            cmd = f"INSERT INTO booksinloan (fk_book_id, fk_loan_id) VALUES ({book_id}, {last_loan_id});"
             cur.execute(cmd)
-            cmd = f"update Book set loan_status = 1 where book_id = {book_id};"
+            cmd = f"UPDATE Book SET loan_status = 1 WHERE book_id = {book_id};"
             cur.execute(cmd)
             db.commit()
             print("Loan Complete")
         else:
             print("Could not loan book, try again")
-        bookIn = input("Which book would you like to loan (end transaction with 0): ")
+        bookIn = input("Loan Book by Title (0 or enter to exit): ")
     return
 
 
-def returnBook(*args):
+### Prints Formatted Table or View ###
+# Param = Optional, or table name as string
+# Counts max column width and dynamically sizes the table
+# Returns None
+def printTable(*args):
+    if len(args):
+        cmd = f"SELECT * FROM {args[0]};"
+        cur.execute(cmd)
+    
+    cols = [c[0] for c in cur.description]
+    rows = cur.fetchall()
+
+    col_widths = [
+        max(len(str(value)) for value in col)
+        for col in zip(*rows, cols) ]
+    
+    print()
+    head = " | ".join(n.ljust(w) for n, w in zip(cols, col_widths))
+    print(head)
+
+    for r in rows:
+        print(" | ".join(str(item).ljust(w) for item, w in zip(r, col_widths)))
+    print()
+    return
+
+
+def returnBooksOrLoans(*args):
     loan_ids = []
     returnLoan = False
     splitted = []
     
-    if len(args) == 0:
-        listTableContent("5")
-        userIn = input("Which user is returning the book (give member_id): ")
-        cmd = f"select * from member where member_id = ?;"
-        cur.execute(cmd, (userIn,))
-        user = cur.fetchone()
-        if not user:
-            print("User not found. Abort!")
-            return
-        user_id = user[0]
-        print()
-
-
-        cmd = 'select * from Loan_view where "Member id" = ?;'
+    if not len(args):
+        user_id = findMemberByID()
+        cmd = 'SELECT * FROM LoanView WHERE "Member id" = ?;'
         cur.execute(cmd, (user_id,))
-        rows = cur.fetchall()
-
-        cols = [c[0] for c in cur.description]
-        col_width = [9, 9, 10, 10, 9, 50]
-        head = " | ".join(n.ljust(w) for n, w in zip(cols, col_width))
-        print(head)
-        for r in rows:
-            print(" | ".join(str(item).ljust(w) for item, w in zip(r, col_width)))
-        print()
-        
+        printTable()
+    
         userIn = input("Return books by 'Book id' or 'a, Loan id' for all in loan (0 or enter to exit): ")
-        splitted = [i.strip() for i in userIn.split(",")]
+        ## Parse user input
+        for i in userIn.split(','):
+            splitted.append(i.strip())
+        # if user pressed enter or 0 -> make exit
+        if "0" in splitted or '' in splitted or not len(splitted):
+            return False
 
-        if "0" in splitted or '' in splitted:
-            return
-        if len(splitted) < 1:
-            return
     else:
         user_id = args[0]
         returnLoan = True
-        cmd = "select loan_id from Loan where fk_member_id = ?;"
+        cmd = "SELECT loan_id FROM Loan WHERE fk_member_id = ?;"
         cur.execute(cmd, (user_id,))
         res = cur.fetchall()
-        #print(res)
+    
         for r in res:
             loan_ids.append(r[0])
         print(loan_ids)
 
 
     books_to_return = []
+    # This is separating loan ids to be returned
     for com in splitted:
         if returnLoan:
             loan_ids.append(int(com))
-
         if com == "a":
             returnLoan = True
             continue
         else:
             books_to_return.append(int(com))
 
-    
-    if not returnLoan:
-        for book_id in books_to_return:
-            try:
-                cmd = "update Book set loan_status = 0 where book_id = ?;"
-                cur.execute(cmd, (book_id,))
-                cmd = "delete from BooksInLoan where fk_book_id = ?;"
-                cur.execute(cmd, (book_id,))
-            except sq.OperationalError as e:
-                print("Could not return books")
-                print(e)
-                return              
-        db.commit()
-        return
+    if not returnLoan and not returnSingleBooks(books_to_return):
+        return False
+    if not returnLoans(loan_ids):
+        return False
 
+    print("Books returned!")
+    print()
+    return True
+
+
+def returnSingleBooks(book_ids):
+    for book_id in book_ids:
+        try:
+            cmd = "UPDATE Book SET loan_status = 0 WHERE book_id = ?;"
+            cur.execute(cmd, (book_id,))
+            cmd = "DELETE FROM BooksInLoan WHERE fk_book_id = ?;"
+            cur.execute(cmd, (book_id,))
+        except sq.OperationalError as e:
+            print("Could not return books")
+            print(e)
+            return False      
+        db.commit()
+    
+    return True
+    
+
+def returnLoans(loan_ids):
     for loan_id in loan_ids:
         try:
-            cmd = "select fk_book_id from BooksInLoan where fk_loan_id = ?;"
+            cmd = "SELECT fk_book_id FROM BooksInLoan WHERE fk_loan_id = ?;"
             cur.execute(cmd,(loan_id,))
             book_ids = cur.fetchall()
             for i in book_ids:
-                cmd = "update Book set loan_status = 0 where book_id = ?;"
+                cmd = "UPDATE Book SET loan_status = 0 WHERE book_id = ?;"
                 cur.execute(cmd, i)
             
-            cmd = "delete from BooksInLoan where fk_loan_id = ?;"
+            cmd = "DELETE FROM BooksInLoan WHERE fk_loan_id = ?;"
             cur.execute(cmd, (loan_id,))
-            cmd = "delete from Loan where loan_id = ?;"
+            cmd = "DELETE FROM Loan WHERE loan_id = ?;"
             cur.execute(cmd, (loan_id,))
             db.commit()
 
         except sq.OperationalError as e:
             print("Could not return loan")
             print(e)
-            
-    return
+            return False
+    return True
 
 
 def removeBook():
@@ -369,7 +362,7 @@ def removeBook():
     userIn = input(f"Are you sure you want to delete {book} ")
     if userIn.capitalize() == "Y":
         cmd = f"DELETE FROM Book WHERE book_id = {bookID}"
-        returnBook(bookID)
+        returnBooksOrLoans(bookID)
         cur.execute(cmd)
         print("Book deleted!")
         db.commit()
@@ -387,18 +380,21 @@ def removeMember():
         print(user)
     print()
     userID = input("Give user id you want to delete: ")
-    if userID == "":
+    if userID == "" or not userID.isnumeric():
         print("Returning to menu.")
         return
+
     user = cur.execute(f"SELECT first_name,last_name from Member WHERE member_id = {userID}").fetchone()
     userIn = input(f"Are you sure you want to delete {user} ")
     if userIn.capitalize() == "Y":
-        cmd = f"DELETE FROM Member WHERE member_id = {userID}"
-        cur.execute(cmd)
-        print("User deleted!")
-        returnBook(userID)
-        print("User books returned.")
-        db.commit()
+        if returnBooksOrLoans(userID):
+            cmd = f"DELETE FROM Member WHERE member_id = {userID}"
+            cur.execute(cmd)
+            print("User deleted!")
+            print("User books returned.")
+            db.commit()
+        else:
+            print("Could not delete user. Abort!")
     else:
         db.rollback()
         
@@ -407,18 +403,15 @@ def removeMember():
 
 def listTableContent(userIn):
     if (userIn == "1"):
-        cmd = "SELECT * FROM Book;"
+        printTable("Book")
     elif (userIn == "2"):
-        cmd = "SELECT * FROM Author;"
+        printTable("Author")
     elif (userIn == "3"):
-        cmd = "SELECT * FROM Publisher;"
+        printTable("Publisher")
     elif (userIn == "4"):
-        cmd = "SELECT * FROM Genre;"
+        printTable("Genre")
     elif (userIn == "5"):
-        cmd = "SELECT * FROM Member;"
-    cur.execute(cmd)
-    for row in cur.fetchall():
-        print(row)
+        printTable("Member")
     return
 
 
@@ -455,6 +448,7 @@ def findBooks():
     for j in booksByTitle:
         print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |".format(j["Title"][:30],j["Genre"][:24],j["Author"][:20],j["Publisher"],j["Released"][:10].replace("/","."),j["Loaned"]))
     return
+
 
 def inputFromSQL():
     fName = input("Give sql filename: ")
@@ -528,7 +522,7 @@ def main():
             loanBook()
 
         elif (userIn == "11"):
-            returnBook()
+            returnBooksOrLoans()
 
         elif (userIn == "12"):
             removeBook()
