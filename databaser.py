@@ -1,11 +1,12 @@
 ## This program utilizes template python program given in the Week task Topic 6
 import sqlite3 as sq
 from datetime import datetime, timedelta
+import os
 
 db = sq.connect("prokkis.db")
 cur = db.cursor()
 cur.execute("PRAGMA foreign_keys = ON;")
-
+ 
 def initDB():
     try:
         f = open("sqlcmd.sql", "r")
@@ -19,20 +20,10 @@ def initDB():
         print("Include sqlcmd.sql file in the same folder as databaser.py")
         return False
 
-    except sq.DatabaseError as e:
-        print("Mistake or two in database. Abort!")
-        print(e)
-        return False
-    
-    except sq.OperationalError as e:
-        print("An error has occured in 'sqlcmd.sql file'. Abort!")
-        print(e)
-        return False
-
     except sq.Error as e:
-        print("'Segmentation Fault.' Abandon ship!")
+        print("DB exists, hopefully...")
         print(e)
-        return False
+
     return True
 
 
@@ -544,7 +535,7 @@ def modifyMember():
             cmd = "UPDATE Member SET email = ? WHERE member_id = ?;"
         newData = input("New value: ")
         try:
-            cur.execute(cmd, (newData,userIn))
+            cur.execute(cmd, (newData,user_id))
         
         except sq.OperationalError as e:
             print("Could not modify data. Abort!")
@@ -581,7 +572,7 @@ def modifyBook():
     
         newData = input("New value: ")
         try:
-            cur.execute(cmd, (newData,userIn))
+            cur.execute(cmd, (newData,user_id))
         
         except sq.OperationalError as e:
             print("Could not modify data. Abort!")
@@ -598,7 +589,8 @@ def modifyBook():
 
 
 def main():
-    if not initDB(): return -1
+    if not os.path.isfile("prokkis.db"):
+        if not initDB(): return -1
 
     userIn = -1
     while(userIn != "0"):
