@@ -1,15 +1,14 @@
 ## This program utilizes template python program given in the Week task Topic 6
 import sqlite3 as sq
 from datetime import datetime, timedelta
-import os
 
 db = sq.connect("prokkis.db")
 cur = db.cursor()
 cur.execute("PRAGMA foreign_keys = ON;")
- 
+
 def initDB():
     try:
-        f = open("sqlcmd.sql", "r")
+        f = open("sqlcmds.sql", "r")
         command = ""
         for l in f.readlines():
             command += l
@@ -257,9 +256,13 @@ def printTable(*args):
     print(head)
     dashline = "-" * len(head)
     print(dashline)
-
+    cnt = 0
     for r in rows:
         print(" | ".join(str(item).ljust(w) for item, w in zip(r, col_widths)))
+        cnt += 1
+        if cnt >= 500:
+            input("Press Enter to Continue... ")
+            cnt = 0
     print()
     return
 
@@ -606,8 +609,7 @@ def modifyBook():
 
 
 def main():
-    if not os.path.isfile("prokkis.db"):
-        if not initDB(): return -1
+    if not initDB(): return -1
 
     userIn = -1
     while(userIn != "0"):

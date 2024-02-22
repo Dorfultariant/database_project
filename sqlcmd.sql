@@ -6,6 +6,8 @@ create table Member (
         PhoneNumber VARCHAR(10) UNIQUE NOT NULL,
         Email VARCHAR(25) UNIQUE
 );
+-- MemberID is used often to find target members
+CREATE INDEX MemberIDX ON Member(MemberID);
 
 create table Loan (
         LoanID INTEGER PRIMARY KEY NOT NULL,
@@ -27,6 +29,9 @@ create table Book (
         FOREIGN KEY (FKAuthorID) REFERENCES Author(AuthorID) ON DELETE CASCADE,
         FOREIGN KEY (FKPublisherID) REFERENCES Publisher(PublisherID) ON DELETE CASCADE
 );
+
+-- Book id is used a lot for targeting books
+CREATE INDEX BookIDX ON Book(BookID);
 
 create table BooksInLoan (
         FKBookID INTEGER NOT NULL,
