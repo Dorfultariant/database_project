@@ -1,15 +1,14 @@
 ## This program utilizes template python program given in the Week task Topic 6
 import sqlite3 as sq
 from datetime import datetime, timedelta
-import os
 
 db = sq.connect("prokkis.db")
 cur = db.cursor()
 cur.execute("PRAGMA foreign_keys = ON;")
- 
+
 def initDB():
     try:
-        f = open("sqlcmd.sql", "r")
+        f = open("sqlcmds.sql", "r")
         command = ""
         for l in f.readlines():
             command += l
@@ -257,9 +256,13 @@ def printTable(*args):
     print(head)
     dashline = "-" * len(head)
     print(dashline)
-
+    cnt = 0
     for r in rows:
         print(" | ".join(str(item).ljust(w) for item, w in zip(r, col_widths)))
+        cnt += 1
+        if cnt >= 500:
+            input("Press Enter to Continue... ")
+            cnt = 0
     print()
     return
 
@@ -450,6 +453,8 @@ def findBooks():
     if userIn1 not in ["Title","loaned"]:
         for i in cur.execute(f"SELECT {userIn1} from BooksByTitle").fetchall():
             i = i[0]
+            if i == None:
+                continue
             i = i.split(",")
             for j in i:
                 tempList.add(j)
@@ -475,25 +480,40 @@ def inputFromSQL():
         f = open(fName, "r")
         command = ""
         addedData = []
+        # cur.executescript(f.read())  
+        '''commented out works slower??? why?
+        from index and optimization pdf there was Mass insert is always faster than multiple inserts
+        One insert adding 1000 rows vs. 1000 inserts adding one row '''
         for l in f.readlines():
             command += l
             if command.endswith(";\n") or command.endswith(";"):
-                cur.execute(command)
-                addedData.append(command)
+                try:
+                    cur.execute(command)
+                    addedData.append(command)
+                except sq.DatabaseError as x:
+                    print(x ," Object was already in database. command was: ",command)
+                    # print(addedData[-1])
+                
                 command = ""
 
     except sq.OperationalError as x:
         print(x)
         db.rollback()
+        return
+
     except sq.DatabaseError as x:
         print(x)
         db.rollback()
+        return
+
     except sq.Error as x:
         print("Oh no! .sql not found.. or something else is off",x)
         db.rollback()
+        return
     except:
         print("something went wrong. Rolling back.")
         db.rollback()
+        return
     print("This data is inputted.")
     for i in addedData:
         print(i,end="")
@@ -606,8 +626,7 @@ def modifyBook():
 
 
 def main():
-    if not os.path.isfile("prokkis.db"):
-        if not initDB(): return -1
+    if not initDB(): return -1
 
     userIn = -1
     while(userIn != "0"):

@@ -6,8 +6,6 @@ create table Member (
         PhoneNumber VARCHAR(10) UNIQUE NOT NULL,
         Email VARCHAR(25) UNIQUE
 );
--- MemberID is used often to find target members
-CREATE INDEX MemberIDX ON Member(MemberID);
 
 create table Loan (
         LoanID INTEGER PRIMARY KEY NOT NULL,
@@ -29,9 +27,6 @@ create table Book (
         FOREIGN KEY (FKAuthorID) REFERENCES Author(AuthorID) ON DELETE CASCADE,
         FOREIGN KEY (FKPublisherID) REFERENCES Publisher(PublisherID) ON DELETE CASCADE
 );
-
--- Book id is used a lot for targeting books
-CREATE INDEX BookIDX ON Book(BookID);
 
 create table BooksInLoan (
         FKBookID INTEGER NOT NULL,
@@ -66,13 +61,13 @@ create table Publisher (
         Email VARCHAR(25) UNIQUE
 );
 
-create view LoanView as 
-        select Member.MemberID as "Member id", 
-        Loan.LoanID as "Loan id", 
-        Loan.LoanDate as "Loan Date", 
-        Loan.DueDate as "Due Date", 
-        Book.BookID as "Book id", 
-        Book.Title as "Book Title" 
+create view LoanView as
+        select Member.MemberID as "Member id",
+        Loan.LoanID as "Loan id",
+        Loan.LoanDate as "Loan Date",
+        Loan.DueDate as "Due Date",
+        Book.BookID as "Book id",
+        Book.Title as "Book Title"
         from Loan
         join Member on Loan.FKMemberID = Member.MemberID
         join BooksInLoan on BooksInLoan.FKLoanID = Loan.LoanID
@@ -86,12 +81,17 @@ create view BooksByTitle as
         book.PublishDate as "Released",
         book.IsLoaned as "Loaned"
         from book
-        join author on author.AuthorID = book.FKAuthorID
-        join publisher on publisher.PublisherID = book.FKPublisherID
-        join GenresOfBook on GenresOfBook.FKBookID = book.BookID
-        join genre on genre.GenreID = GenresOfBook.FKGenreID
-        group By book.Title;
-
+        left join author on author.AuthorID = book.FKAuthorID
+        left join publisher on publisher.PublisherID = book.FKPublisherID
+        left join GenresOfBook on GenresOfBook.FKBookID = book.BookID
+        left join genre on genre.GenreID = GenresOfBook.FKGenreID
+        group By book.Title
+        order by book.title;
+-- MemberID is used often to find target members
+CREATE INDEX MemberIDX ON Member(MemberID);
+CREATE INDEX FKMemberIDX ON Loan(FKMemberID);
+-- Book id is used a lot for targeting books
+CREATE INDEX BookIDX ON Book(BookID);
 
 insert into Member (MemberID, FirstName, LastName, Address, PhoneNumber, Email) values (1000,'Land', 'Witling'      , '88 Gulseth Hill'     , '962-756-5469'        , 'lwitling0@webs.com'                  );
 insert into Member (MemberID, FirstName, LastName, Address, PhoneNumber, Email) values (1001,'Claudian', 'Runciman' , '0562 Quincy Park'    , '795-238-0413'        , 'crunciman1@meetup.com'               );
@@ -225,5 +225,6 @@ insert into BooksInLoan (FKBookID, FKLoanID) values (2010, 6009);
 insert into BooksInLoan (FKBookID, FKLoanID) values (2004, 6008);
 insert into BooksInLoan (FKBookID, FKLoanID) values (2019, 6008);
 insert into BooksInLoan (FKBookID, FKLoanID) values (2006, 6009);
+
 
 
