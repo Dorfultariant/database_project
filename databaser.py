@@ -12,16 +12,28 @@ def initDB():
         command = ""
         for l in f.readlines():
             command += l
-        ##print("Creation successful")
-        ##print(command)
         cur.executescript(command)
-    
-    except sq.OperationalError as x:
-        print("DB exists, init skip", x)
-    except:
-        print("Oh no! .sql not found.. or something else is off")
-    return
 
+    except FileNotFoundError:
+        print("sqlcmd.sql file not found. Abort!")
+        print("Include sqlcmd.sql file in the same folder as databaser.py")
+        return False
+
+    except sq.DatabaseError as e:
+        print("Mistake or two in database. Abort!")
+        print(e)
+        return False
+    
+    except sq.OperationalError as e:
+        print("An error has occured in 'sqlcmd.sql file'. Abort!")
+        print(e)
+        return False
+
+    except sq.Error as e:
+        print("'Segmentation Fault.' Abandon ship!")
+        print(e)
+        return False
+    return True
 
 
 def menu():
@@ -174,7 +186,7 @@ def findByID(table, target):
     row = cur.fetchone()
     if not row:
         print("Data not found. Abort!")
-        return
+        return False
     row_id = row[0]
     print()
     return row_id
@@ -184,18 +196,18 @@ def listLoans():
     print()
     print("##### LOANS #####")
     print()
- 
     user_id = findByID("Member", "member_id")
+    if not user_id: return False
     cmd = """SELECT * FROM LoanView WHERE "Member id" = ?;"""
     cur.execute(cmd, (user_id,))
     printTable()
     
-    return
+    return True
 
 
 def loanBook():
     user_id = findByID("Member", "member_id")
-
+    if not user_id: return False
     cmd = """SELECT * FROM BooksByTitle WHERE "Loaned" = 0;"""
     print("Available books:")
     cur.execute(cmd)
@@ -261,6 +273,7 @@ def returnBooksOrLoans(*args):
     
     if not len(args):
         user_id = findByID("Member", "member_id")
+        if not user_id: return False
         cmd = 'SELECT * FROM LoanView WHERE "Member id" = ?;'
         cur.execute(cmd, (user_id,))
         printTable()
@@ -505,70 +518,87 @@ def deleteAuthor(): #69
     # db.commit()
     return
 
+
 def modifyMember():
     cmd = ""
-    userIn = findByID("Member", "member_id")
-    print("1: First name")
-    print("2: Last name")
-    print("3: Address")
-    print("4: Phone number")
-    print("5: Email")
-    opt = input("What to modify (0 or enter to exit): ")
-    if opt == "" or opt == "0": return
-    if opt == "1":
-        cmd = "UPDATE Member SET first_name = ? WHERE member_id = ?;"
-    elif opt == "2":
-        cmd = "UPDATE Member SET last_name = ? WHERE member_id = ?;"
-    elif opt == "3":
-        cmd = "UPDATE Member SET address = ? WHERE member_id = ?;"
-    elif opt == "4":
-        cmd = "UPDATE Member SET phone_number = ? WHERE member_id = ?;"
-    elif opt == "5":
-        cmd = "UPDATE Member SET email = ? WHERE member_id = ?;"
-    newData = input("New value: ")
-    try:
-        cur.execute(cmd, (newData,userIn))
-    
-    except sq.OperationalError as e:
-        print("Could not modify data. Abort!")
-        print(e)
-        return False
-    db.commit()
-    printTable("Member")
-    print("Member information updated!")
+    opt = "-1"
+    user_id = findByID("Member", "member_id")
+    if not user_id: return False
+    while (opt != "0" or opt != ""):
+        print("1: First name")
+        print("2: Last name")
+        print("3: Address")
+        print("4: Phone number")
+        print("5: Email")
+        opt = input("What to modify (0 or enter to exit): ")
+        if opt == "" or opt == "0": return
+        if opt == "1":
+            cmd = "UPDATE Member SET first_name = ? WHERE member_id = ?;"
+        elif opt == "2":
+            cmd = "UPDATE Member SET last_name = ? WHERE member_id = ?;"
+        elif opt == "3":
+            cmd = "UPDATE Member SET address = ? WHERE member_id = ?;"
+        elif opt == "4":
+            cmd = "UPDATE Member SET phone_number = ? WHERE member_id = ?;"
+        elif opt == "5":
+            cmd = "UPDATE Member SET email = ? WHERE member_id = ?;"
+        newData = input("New value: ")
+        try:
+            cur.execute(cmd, (newData,userIn))
+        
+        except sq.OperationalError as e:
+            print("Could not modify data. Abort!")
+            print(e)
+            return False
+        except sq.DatabaseError as e:
+            print("Could not modify data. Abort!")
+            print(e)
+            return False
+        db.commit()
+        printTable("Member")
+        print("Member information updated!")
+        print()
     return True
+
 
 def modifyBook():
     cmd = ""
-    userIn = findByID("Book", "book_id")
-    print()
-    print("1: Title")
-    print("2: ISBN")
-    print("3: Publish Date")
-    opt = input("What to modify (0 or enter to exit): ")
-    if opt == "" or opt == "0": return
-    if opt == "1":
-        cmd = "UPDATE Book SET title = ? WHERE book_id = ?;"
-    elif opt == "2":
-        cmd = "UPDATE Book SET isbn = ? WHERE book_id = ?;"
-    elif opt == "3":
-        cmd = "UPDATE Book SET publish_date = ? WHERE book_id = ?;"
- 
-    newData = input("New value: ")
-    try:
-        cur.execute(cmd, (newData,userIn))
+    opt = "-1"
+    user_id = findByID("Book", "book_id")
+    if not user_id: return False
+    while (opt != "0" or opt != ""):
+        print("1: Title")
+        print("2: ISBN")
+        print("3: Publish Date")
+        opt = input("What to modify (0 or enter to exit): ")
+        if opt == "" or opt == "0": return
+        if opt == "1":
+            cmd = "UPDATE Book SET title = ? WHERE book_id = ?;"
+        elif opt == "2":
+            cmd = "UPDATE Book SET isbn = ? WHERE book_id = ?;"
+        elif opt == "3":
+            cmd = "UPDATE Book SET publish_date = ? WHERE book_id = ?;"
     
-    except sq.OperationalError as e:
-        print("Could not modify data. Abort!")
-        print(e)
-        return False
-    db.commit()
-    printTable("Book")
-    print("Book information updated!")
+        newData = input("New value: ")
+        try:
+            cur.execute(cmd, (newData,userIn))
+        
+        except sq.OperationalError as e:
+            print("Could not modify data. Abort!")
+            print(e)
+            return False
+        except sq.DatabaseError as e:
+            print("Could not modify data. Abort!")
+            print(e)
+            return False
+        db.commit()
+        printTable("Book")
+        print("Book information updated!")
     return True
 
+
 def main():
-    initDB()
+    if not initDB(): return -1
 
     userIn = -1
     while(userIn != "0"):
