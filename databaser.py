@@ -27,25 +27,23 @@ def initDB():
 def menu():
     print()
     print("##### MENU OPTIONS #####")
-    print("1) List Books")
-    print("2) List Authors")
-    print("3) List Publishers")
-    print("4) List Genres")
-    print("5) List Members")
+    print("1) List Tables")
+    print("2) Modify Member")
+    print("3) Modify Book")
     print()
-    print("6) List Member Loans")
-    print("7) Find Books")
+    print("4) List Member Loans")
+    print("5) Find Books")
     print()
-    print("8) Insert Book")
-    print("9) Insert Member")
+    print("6) Insert Book")
+    print("7) Insert Member")
     print()
-    print("10) Loan Book")
-    print("11) Return Book")
+    print("8) Loan Book")
+    print("9) Return Book")
     print()
-    print("12) Remove Book")
-    print("13) Remove Member")
+    print("10) Remove Book")
+    print("11) Remove Member")
     print()
-    print("14) Input from sql file")
+    print("12) Input from sql file")
 
     print("Your selection: ", end="")
     userIn = input()
@@ -167,19 +165,19 @@ def insertMember():
     return
 
 
-def findMemberByID():
-    printTable("Member")
-    userIn = input("Give Member ID: ")
+def findByID(table, target):
+    printTable(table)
+    userIn = input(f"Give {table} ID: ")
 
-    cmd = f"SELECT * FROM Member WHERE member_id = ?;"
+    cmd = f"SELECT * FROM {table} WHERE {target} = ?;"
     cur.execute(cmd, (userIn,))
-    user = cur.fetchone()
-    if not user:
-        print("User not found. Abort!")
+    row = cur.fetchone()
+    if not row:
+        print("Data not found. Abort!")
         return
-    user_id = user[0]
+    row_id = row[0]
     print()
-    return user_id
+    return row_id
 
 
 def listLoans():
@@ -187,7 +185,7 @@ def listLoans():
     print("##### LOANS #####")
     print()
  
-    user_id = findMemberByID()
+    user_id = findByID("Member", "member_id")
     cmd = """SELECT * FROM LoanView WHERE "Member id" = ?;"""
     cur.execute(cmd, (user_id,))
     printTable()
@@ -196,7 +194,7 @@ def listLoans():
 
 
 def loanBook():
-    user_id = findMemberByID()
+    user_id = findByID("Member", "member_id")
 
     cmd = """SELECT * FROM BooksByTitle WHERE "Loaned" = 0;"""
     print("Available books:")
@@ -212,14 +210,14 @@ def loanBook():
 
     bookIn = input("Loan Book by Title (0 or enter to exit): ")
     while (bookIn != "0" and bookIn != ""):
-        cmd = f"SELECT * FROM Book WHERE title = ? AND loan_status = 0;"
+        cmd = f"SELECT * FROM Book WHERE title = ? AND is_loaned = 0;"
         cur.execute(cmd, (bookIn,))
         book = cur.fetchone()
         if book:
             book_id = book[0]
             cmd = f"INSERT INTO booksinloan (fk_book_id, fk_loan_id) VALUES ({book_id}, {last_loan_id});"
             cur.execute(cmd)
-            cmd = f"UPDATE Book SET loan_status = 1 WHERE book_id = {book_id};"
+            cmd = f"UPDATE Book SET is_loaned = 1 WHERE book_id = {book_id};"
             cur.execute(cmd)
             db.commit()
             print("Loan Complete")
@@ -233,6 +231,7 @@ def loanBook():
 # Param = Optional, or table name as string
 # Counts max column width and dynamically sizes the table
 # Returns None
+## Helpful link: https://stackoverflow.com/questions/9989334/create-nice-column-output-in-python
 def printTable(*args):
     if len(args):
         cmd = f"SELECT * FROM {args[0]};"
@@ -261,7 +260,7 @@ def returnBooksOrLoans(*args):
     splitted = []
     
     if not len(args):
-        user_id = findMemberByID()
+        user_id = findByID("Member", "member_id")
         cmd = 'SELECT * FROM LoanView WHERE "Member id" = ?;'
         cur.execute(cmd, (user_id,))
         printTable()
@@ -310,7 +309,7 @@ def returnBooksOrLoans(*args):
 def returnSingleBooks(book_ids):
     for book_id in book_ids:
         try:
-            cmd = "UPDATE Book SET loan_status = 0 WHERE book_id = ?;"
+            cmd = "UPDATE Book SET is_loaned = 0 WHERE book_id = ?;"
             cur.execute(cmd, (book_id,))
             cmd = "DELETE FROM BooksInLoan WHERE fk_book_id = ?;"
             cur.execute(cmd, (book_id,))
@@ -330,7 +329,7 @@ def returnLoans(loan_ids):
             cur.execute(cmd,(loan_id,))
             book_ids = cur.fetchall()
             for i in book_ids:
-                cmd = "UPDATE Book SET loan_status = 0 WHERE book_id = ?;"
+                cmd = "UPDATE Book SET is_loaned = 0 WHERE book_id = ?;"
                 cur.execute(cmd, i)
             
             cmd = "DELETE FROM BooksInLoan WHERE fk_loan_id = ?;"
@@ -401,7 +400,15 @@ def removeMember():
     return
 
 
-def listTableContent(userIn):
+def listTableContent():
+    print()
+    print("1: List Books")
+    print("2: List Authors")
+    print("3: List Publishers")
+    print("4: List Genres")
+    print("5: List Members")
+    userIn = input("Option (0 or enter to exit): ")
+    if userIn == "" or userIn == "0": return
     if (userIn == "1"):
         printTable("Book")
     elif (userIn == "2"):
@@ -412,6 +419,8 @@ def listTableContent(userIn):
         printTable("Genre")
     elif (userIn == "5"):
         printTable("Member")
+    else:
+        print("Invalid input,")
     return
 
 
@@ -496,6 +505,68 @@ def deleteAuthor(): #69
     # db.commit()
     return
 
+def modifyMember():
+    cmd = ""
+    userIn = findByID("Member", "member_id")
+    print("1: First name")
+    print("2: Last name")
+    print("3: Address")
+    print("4: Phone number")
+    print("5: Email")
+    opt = input("What to modify (0 or enter to exit): ")
+    if opt == "" or opt == "0": return
+    if opt == "1":
+        cmd = "UPDATE Member SET first_name = ? WHERE member_id = ?;"
+    elif opt == "2":
+        cmd = "UPDATE Member SET last_name = ? WHERE member_id = ?;"
+    elif opt == "3":
+        cmd = "UPDATE Member SET address = ? WHERE member_id = ?;"
+    elif opt == "4":
+        cmd = "UPDATE Member SET phone_number = ? WHERE member_id = ?;"
+    elif opt == "5":
+        cmd = "UPDATE Member SET email = ? WHERE member_id = ?;"
+    newData = input("New value: ")
+    try:
+        cur.execute(cmd, (newData,userIn))
+    
+    except sq.OperationalError as e:
+        print("Could not modify data. Abort!")
+        print(e)
+        return False
+    db.commit()
+    printTable("Member")
+    print("Member information updated!")
+    return True
+
+def modifyBook():
+    cmd = ""
+    userIn = findByID("Book", "book_id")
+    print()
+    print("1: Title")
+    print("2: ISBN")
+    print("3: Publish Date")
+    opt = input("What to modify (0 or enter to exit): ")
+    if opt == "" or opt == "0": return
+    if opt == "1":
+        cmd = "UPDATE Book SET title = ? WHERE book_id = ?;"
+    elif opt == "2":
+        cmd = "UPDATE Book SET isbn = ? WHERE book_id = ?;"
+    elif opt == "3":
+        cmd = "UPDATE Book SET publish_date = ? WHERE book_id = ?;"
+ 
+    newData = input("New value: ")
+    try:
+        cur.execute(cmd, (newData,userIn))
+    
+    except sq.OperationalError as e:
+        print("Could not modify data. Abort!")
+        print(e)
+        return False
+    db.commit()
+    printTable("Book")
+    print("Book information updated!")
+    return True
+
 def main():
     initDB()
 
@@ -503,42 +574,34 @@ def main():
     while(userIn != "0"):
         userIn = menu() 
         ## List Books, Authors, Publishers, Genres, Members 
-        if   (userIn in ["1", "2", "3","4","5"]):
-            listTableContent(userIn) 
-
-        elif (userIn == "6"):
+        if   (userIn == "1"):
+            listTableContent()
+        elif (userIn == "2"):
+            modifyMember()
+        elif (userIn == "3"):
+            modifyBook()
+        elif (userIn == "4"):
             listLoans()
-
-        elif (userIn == "7"):
+        elif (userIn == "5"):
             findBooks()
-        
-        elif (userIn == "8"):
+        elif (userIn == "6"):
             insertBook()
-        
-        elif (userIn == "9"):
+        elif (userIn == "7"):
             insertMember()
-        
-        elif (userIn == "10"):
+        elif (userIn == "8"):
             loanBook()
-
-        elif (userIn == "11"):
+        elif (userIn == "9"):
             returnBooksOrLoans()
-
-        elif (userIn == "12"):
+        elif (userIn == "10"):
             removeBook()
-
-        elif (userIn == "13"):
+        elif (userIn == "11"):
             removeMember()
-            
-        elif (userIn == "14"):
+        elif (userIn == "12"):
             inputFromSQL()
-            
         elif (userIn == "69"):
             deleteAuthor()
-
         elif (userIn == "0"):
             continue
-        
         else:
             print("Try again.")
                 

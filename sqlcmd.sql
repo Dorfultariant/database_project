@@ -21,7 +21,7 @@ create table Book (
         title VARCHAR(20) NOT NULL,
         isbn VARCHAR(13) NOT NULL CHECK(LENGTH(isbn) IN (10, 13)),
         publish_date VARCHAR(12),
-        loan_status BOOL NOT NULL DEFAULT FALSE,
+        is_loaned BOOL NOT NULL DEFAULT FALSE,
         fk_author_id INTEGER,
         fk_publisher_id INTEGER,
         FOREIGN KEY (fk_author_id) REFERENCES Author(author_id) ON DELETE CASCADE,
@@ -79,7 +79,7 @@ create view BooksByTitle as
         author.author_firstname || " " || author.author_surname as "Author",
         publisher.publisher_name as "Publisher",
         book.publish_date as "Released",
-        book.loan_status as "Loaned"
+        book.is_loaned as "Loaned"
         from book
         join author on author.author_id = book.fk_author_id
         join publisher on publisher.publisher_id = book.fk_publisher_id
@@ -150,26 +150,26 @@ insert into Loan (loan_id, loan_date, due_date, fk_member_id) values (6007, '9/2
 insert into Loan (loan_id, loan_date, due_date, fk_member_id) values (6008, '1/28/7512' , '4/3/4044'     , 1002  );
 insert into Loan (loan_id, loan_date, due_date, fk_member_id) values (6009, '12/24/6899', '4/14/8836'   , 1001  );
 
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2000,  'Item, The'         , '9513807274'  , '7/15/1996'   , 1 , 4000, 5001 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2001,  'Style Wars'        , '3788792957'  , '2/21/2078'   , 1 , 4000, 5001 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2002,  'Cimarron'          , '5983915355'  , '6/28/1907'   , 1 , 4000, 5001 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2003,  'Ziegfeld Follies'  , '1745407987'  , '7/9/2010'    , 0 , 4001, 5000 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2004,  'Law, Hot Wind Blows', '9507172505' , '6/16/2041'   , 1 , 4001, 5000 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2005,  'Grace Unplugged'   , '2097531830'  , '6/4/1978'    , 0 , 4002, 5000 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2006,  'The Overcoat'      , '660089606X'  , '11/25/2028'  , 1 , 4003, 5002 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2007,  'Make Your Move'    , '3828944272'  , '5/23/1931'   , 0 , 4004, 5002 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2008,  'Thr3e'             , '520348323X'  , '12/16/2091'  , 1 , 4005, 5002 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2009,  'The Company'       , '8644701363'  , '8/22/1968'   , 0 , 4005, 5003 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2010,  'Escape Artist'     , '2982580977'  , '12/18/2100'  , 1 , 4005, 5003 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2011,  'Phantom of the Opera', '0774945400', '5/20/2100'   , 1 , 4005, 5003 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2012,  'Have No Memories'  , '9835419051'  , '10/1/1989'   , 1 , 4005, 5003 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2013,  'Like Someone In Love', '8115336319', '11/4/2100'   , 0 , 4006, 5003 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2014,  'The Circle'        , '5119542824'  , '3/22/1994'   , 1 , 4007, 5004 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2015,  'Trip, The'         , '3359810104'  , '11/20/1973'  , 0 , 4008, 5004 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2016,  'New York Doll'     , '3340780285'  , '4/6/1991'    , 1 , 4009, 5004 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2017,  'Butterflies'       , '5381452640'  , '8/28/2001'   , 1 , 4009, 5002 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2018,  'Loving'            , '7126549326'  , '5/23/2005'   , 0 , 4002, 5004 );
-insert into Book (book_id, title, isbn, publish_date, loan_status, fk_author_id, fk_publisher_id) values (2019,  'Rosenstrasse'      , '5744750746'  , '3/9/2046'    , 1 , 4003, 5001 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2000,  'Item, The'         , '9513807274'  , '7/15/1996'   , 1 , 4000, 5001 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2001,  'Style Wars'        , '3788792957'  , '2/21/2078'   , 1 , 4000, 5001 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2002,  'Cimarron'          , '5983915355'  , '6/28/1907'   , 1 , 4000, 5001 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2003,  'Ziegfeld Follies'  , '1745407987'  , '7/9/2010'    , 0 , 4001, 5000 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2004,  'Law, Hot Wind Blows', '9507172505' , '6/16/2041'   , 1 , 4001, 5000 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2005,  'Grace Unplugged'   , '2097531830'  , '6/4/1978'    , 0 , 4002, 5000 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2006,  'The Overcoat'      , '660089606X'  , '11/25/2028'  , 1 , 4003, 5002 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2007,  'Make Your Move'    , '3828944272'  , '5/23/1931'   , 0 , 4004, 5002 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2008,  'Thr3e'             , '520348323X'  , '12/16/2091'  , 1 , 4005, 5002 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2009,  'The Company'       , '8644701363'  , '8/22/1968'   , 0 , 4005, 5003 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2010,  'Escape Artist'     , '2982580977'  , '12/18/2100'  , 1 , 4005, 5003 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2011,  'Phantom of the Opera', '0774945400', '5/20/2100'   , 1 , 4005, 5003 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2012,  'Have No Memories'  , '9835419051'  , '10/1/1989'   , 1 , 4005, 5003 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2013,  'Like Someone In Love', '8115336319', '11/4/2100'   , 0 , 4006, 5003 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2014,  'The Circle'        , '5119542824'  , '3/22/1994'   , 1 , 4007, 5004 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2015,  'Trip, The'         , '3359810104'  , '11/20/1973'  , 0 , 4008, 5004 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2016,  'New York Doll'     , '3340780285'  , '4/6/1991'    , 1 , 4009, 5004 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2017,  'Butterflies'       , '5381452640'  , '8/28/2001'   , 1 , 4009, 5002 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2018,  'Loving'            , '7126549326'  , '5/23/2005'   , 0 , 4002, 5004 );
+insert into Book (book_id, title, isbn, publish_date, is_loaned, fk_author_id, fk_publisher_id) values (2019,  'Rosenstrasse'      , '5744750746'  , '3/9/2046'    , 1 , 4003, 5001 );
 
 
 insert into GenresOfBook (fk_book_id, fk_genre_id) values (2000, 3000);
