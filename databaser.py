@@ -1,11 +1,12 @@
 ## This program utilizes template python program given in the Week task Topic 6
 import sqlite3 as sq
 from datetime import datetime, timedelta
+import os
 
 db = sq.connect("prokkis.db")
 cur = db.cursor()
 cur.execute("PRAGMA foreign_keys = ON;")
-
+ 
 def initDB():
     try:
         f = open("sqlcmd.sql", "r")
@@ -605,7 +606,8 @@ def modifyBook():
 
 
 def main():
-    if not initDB(): return -1
+    if not os.path.isfile("prokkis.db"):
+        if not initDB(): return -1
 
     userIn = -1
     while(userIn != "0"):
