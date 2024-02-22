@@ -19,20 +19,10 @@ def initDB():
         print("Include sqlcmd.sql file in the same folder as databaser.py")
         return False
 
-    except sq.DatabaseError as e:
-        print("Mistake or two in database. Abort!")
-        print(e)
-        return False
-    
-    except sq.OperationalError as e:
-        print("An error has occured in 'sqlcmd.sql file'. Abort!")
-        print(e)
-        return False
-
     except sq.Error as e:
-        print("'Segmentation Fault.' Abandon ship!")
+        print("Hmm, DB exists (hopefully)")
         print(e)
-        return False
+
     return True
 
 
@@ -65,7 +55,7 @@ def menu():
 
 def insertBook():
     print("You want to insert book? Nice!")
-    title =         input("Book name?: ")
+    Title =         input("Book name?: ")
     genres = set()
  
     genreInput = 1
@@ -84,17 +74,17 @@ def insertBook():
         
 
     print(genres)
-    isbn = input("ISBN?: ")
-    if (len(isbn) != 10 and len(isbn) != 13):
+    ISBN = input("ISBN?: ")
+    if (len(ISBN) != 10 and len(ISBN) != 13):
         input("ISBN number was incorrect. Press enter to return menu.")
         return
     publishDate = input("publish date? MM/DD/YYYY: ")
-    author_firstname = input("Author firstname: ")
-    author_surname = input("Author surname: ")
+    AuthorFirstName = input("Author firstname: ")
+    AuthorLastName = input("Author lastname: ")
     publisher = input("Publisher: ")
     
 
-    cmd = f"SELECT * FROM Author WHERE author_firstname = '{author_firstname}' AND author_surname = '{author_surname}'"
+    cmd = f"SELECT * FROM Author WHERE AuthorFirstName = '{AuthorFirstName}' AND AuthorLastName = '{AuthorLastName}'"
     authorData = cur.execute(cmd)
     row = authorData.fetchone()
     if row != None:
@@ -102,16 +92,16 @@ def insertBook():
         print("AuthorID:",authorID)
     else:
         print("Author is not in database.")
-        nationality = input("Give nationality for author: ")
-        cmd = f"INSERT INTO Author (author_firstname,author_surname,nationality) VALUES ('{author_firstname}','{author_surname}','{nationality}')"
+        Nationality = input("Give Nationality for author: ")
+        cmd = f"INSERT INTO Author (AuthorFirstName,AuthorLastName,Nationality) VALUES ('{AuthorFirstName}','{AuthorLastName}','{Nationality}')"
         cur.execute(cmd)
-        cur.execute(f"SELECT * from Author where author_firstname = '{author_firstname}' AND author_surname = '{author_surname}'")
+        cur.execute(f"SELECT * from Author where AuthorFirstName = '{AuthorFirstName}' AND AuthorLastName = '{AuthorLastName}'")
         authorData = cur.fetchone()
         authorID = authorData[0]
         # print(cur.fetchone())
 
     
-    cmd = f"SELECT * FROM Publisher WHERE publisher_name = '{publisher}'"
+    cmd = f"SELECT * FROM Publisher WHERE PublisherName = '{publisher}'"
     publisherData = cur.execute(cmd)
     row = publisherData.fetchone()
     if row != None:
@@ -120,24 +110,24 @@ def insertBook():
     else:
         print("Publisher is not in database.")
         print("Give adress for publisher: ",end="")
-        address = input()
+        Address = input()
         print("Give e-mail for publisher: ",end="")
-        email = input()
-        cmd = f"INSERT INTO Publisher (publisher_name,address,email) VALUES ('{publisher}','{address}','{email}')"
+        Email = input()
+        cmd = f"INSERT INTO Publisher (PublisherName,Address,Email) VALUES ('{publisher}','{Address}','{Email}')"
         cur.execute(cmd)
-        cur.execute(f"SELECT * from publisher where publisher_name = '{publisher}'")
+        cur.execute(f"SELECT * from publisher where PublisherName = '{publisher}'")
         publisherData = cur.fetchone()
         publisherID = publisherData[0]
 
     print()
-    cmd = f"INSERT INTO book (title, isbn, publish_date,fk_author_id,fk_publisher_id) VALUES ('{title}','{isbn}','{publishDate}',{authorID},{publisherID})"
+    cmd = f"INSERT INTO book (Title, ISBN, PublishDate,FKAuthorID,FKPublisherID) VALUES ('{Title}','{ISBN}','{publishDate}',{authorID},{publisherID})"
     cur.execute(cmd)   
-    cmd = f"SELECT * from book where title = '{title}'"
+    cmd = f"SELECT * from book where Title = '{Title}'"
     addedData = cur.execute(cmd)
     addedData = addedData.fetchone()
     for i in genres:
         print("tulostetaan...",i)
-        genreInsertcmd = f"INSERT INTO GenresOfBook (fk_book_id,fk_genre_id) VALUES ('{addedData[0]}',{i})"
+        genreInsertcmd = f"INSERT INTO GenresOfBook (FKBookID,FKGenreID) VALUES ('{addedData[0]}',{i})"
         cur.execute(genreInsertcmd)
     if addedData:
         print("Following data is added to database.\n",addedData)
@@ -147,22 +137,27 @@ def insertBook():
 
 
 def insertMember():
+    print()
     print("You are adding member to database.")
     memberFirstName = input("Insert first name: ")
     memberSurname = input("Insert surname: ")
     memberAddress = input("Insert home adress: ")
     memberPhoneNumber = input("Insert phone number: ")
-    memberEmail = input("insert email: ")
+    memberEmail = input("insert Email: ")
     print()
     memberData = (memberFirstName,memberSurname,memberAddress,memberPhoneNumber,memberEmail)
     print("You are adding:")
     for i in memberData:
         print(i)
-    if input("Is this correct? y/n").capitalize() == "Y":
-        insertcmd = f"INSERT INTO Member (first_name,last_name,address,phone_number,email) VALUES ('{memberFirstName}','{memberSurname}','{memberAddress}','{memberPhoneNumber}','{memberEmail}')"
+    if input("Is this correct? y/n: ").capitalize() == "Y":
+        insertcmd = f"""INSERT INTO Member (FirstName,LastName,Address,PhoneNumber,Email) VALUES 
+        ('{memberFirstName}','{memberSurname}','{memberAddress}','{memberPhoneNumber}','{memberEmail}')"""
+        
         testiinsertti = cur.execute(insertcmd)
-        print("testiinsertti",testiinsertti.fetchall())
-        cmd = f"SELECT first_name,last_name,address,phone_number,email FROM Member WHERE first_name = '{memberFirstName}' and last_name = '{memberSurname}' and address = '{memberAddress}' and phone_number = '{memberPhoneNumber}' and email = '{memberEmail}'"
+        
+        cmd = f"""SELECT FirstName,LastName,Address,PhoneNumber,Email 
+                FROM Member WHERE FirstName = '{memberFirstName}' and LastName = '{memberSurname}' and Address = '{memberAddress}' 
+                AND PhoneNumber = '{memberPhoneNumber}' and Email = '{memberEmail}'"""
         insertedData = cur.execute(cmd)
         row = insertedData.fetchone()
 
@@ -196,7 +191,7 @@ def listLoans():
     print()
     print("##### LOANS #####")
     print()
-    user_id = findByID("Member", "member_id")
+    user_id = findByID("Member", "MemberID")
     if not user_id: return False
     cmd = """SELECT * FROM LoanView WHERE "Member id" = ?;"""
     cur.execute(cmd, (user_id,))
@@ -206,30 +201,30 @@ def listLoans():
 
 
 def loanBook():
-    user_id = findByID("Member", "member_id")
+    user_id = findByID("Member", "MemberID")
     if not user_id: return False
     cmd = """SELECT * FROM BooksByTitle WHERE "Loaned" = 0;"""
     print("Available books:")
     cur.execute(cmd)
     printTable()
     
-    loan_date = datetime.now().strftime("%m/%d/%Y")
-    due_date = (datetime.now() + timedelta(days = 14)).strftime("%m/%d/%Y")
+    LoanDate = datetime.now().strftime("%m/%d/%Y")
+    DueDate = (datetime.now() + timedelta(days = 14)).strftime("%m/%d/%Y")
     
-    cmd = f"INSERT INTO loan (loan_date, due_date, fk_member_id) VALUES ('{loan_date}','{due_date}','{user_id}');"
+    cmd = f"INSERT INTO loan (LoanDate, DueDate, FKMemberID) VALUES ('{LoanDate}','{DueDate}','{user_id}');"
     cur.execute(cmd)
-    last_loan_id = cur.lastrowid
+    last_LoanID = cur.lastrowid
 
     bookIn = input("Loan Book by Title (0 or enter to exit): ")
     while (bookIn != "0" and bookIn != ""):
-        cmd = f"SELECT * FROM Book WHERE title = ? AND is_loaned = 0;"
+        cmd = f"SELECT * FROM Book WHERE Title = ? AND IsLoaned = 0;"
         cur.execute(cmd, (bookIn,))
         book = cur.fetchone()
         if book:
-            book_id = book[0]
-            cmd = f"INSERT INTO booksinloan (fk_book_id, fk_loan_id) VALUES ({book_id}, {last_loan_id});"
+            BookID = book[0]
+            cmd = f"INSERT INTO booksinloan (FKBookID, FKLoanID) VALUES ({BookID}, {last_LoanID});"
             cur.execute(cmd)
-            cmd = f"UPDATE Book SET is_loaned = 1 WHERE book_id = {book_id};"
+            cmd = f"UPDATE Book SET IsLoaned = 1 WHERE BookID = {BookID};"
             cur.execute(cmd)
             db.commit()
             print("Loan Complete")
@@ -259,6 +254,8 @@ def printTable(*args):
     print()
     head = " | ".join(n.ljust(w) for n, w in zip(cols, col_widths))
     print(head)
+    dashline = "-" * len(head)
+    print(dashline)
 
     for r in rows:
         print(" | ".join(str(item).ljust(w) for item, w in zip(r, col_widths)))
@@ -267,12 +264,12 @@ def printTable(*args):
 
 
 def returnBooksOrLoans(*args):
-    loan_ids = []
+    LoanIDs = []
     returnLoan = False
     splitted = []
     
     if not len(args):
-        user_id = findByID("Member", "member_id")
+        user_id = findByID("Member", "MemberID")
         if not user_id: return False
         cmd = 'SELECT * FROM LoanView WHERE "Member id" = ?;'
         cur.execute(cmd, (user_id,))
@@ -289,20 +286,20 @@ def returnBooksOrLoans(*args):
     else:
         user_id = args[0]
         returnLoan = True
-        cmd = "SELECT loan_id FROM Loan WHERE fk_member_id = ?;"
+        cmd = "SELECT LoanID FROM Loan WHERE FKMemberID = ?;"
         cur.execute(cmd, (user_id,))
         res = cur.fetchall()
     
         for r in res:
-            loan_ids.append(r[0])
-        print(loan_ids)
+            LoanIDs.append(r[0])
+        print(LoanIDs)
 
 
     books_to_return = []
     # This is separating loan ids to be returned
     for com in splitted:
         if returnLoan:
-            loan_ids.append(int(com))
+            LoanIDs.append(int(com))
         if com == "a":
             returnLoan = True
             continue
@@ -311,7 +308,7 @@ def returnBooksOrLoans(*args):
 
     if not returnLoan and not returnSingleBooks(books_to_return):
         return False
-    if not returnLoans(loan_ids):
+    if not returnLoans(LoanIDs):
         return False
 
     print("Books returned!")
@@ -319,13 +316,13 @@ def returnBooksOrLoans(*args):
     return True
 
 
-def returnSingleBooks(book_ids):
-    for book_id in book_ids:
+def returnSingleBooks(BookIDs):
+    for BookID in BookIDs:
         try:
-            cmd = "UPDATE Book SET is_loaned = 0 WHERE book_id = ?;"
-            cur.execute(cmd, (book_id,))
-            cmd = "DELETE FROM BooksInLoan WHERE fk_book_id = ?;"
-            cur.execute(cmd, (book_id,))
+            cmd = "UPDATE Book SET IsLoaned = 0 WHERE BookID = ?;"
+            cur.execute(cmd, (BookID,))
+            cmd = "DELETE FROM BooksInLoan WHERE FKBookID = ?;"
+            cur.execute(cmd, (BookID,))
         except sq.OperationalError as e:
             print("Could not return books")
             print(e)
@@ -335,20 +332,20 @@ def returnSingleBooks(book_ids):
     return True
     
 
-def returnLoans(loan_ids):
-    for loan_id in loan_ids:
+def returnLoans(LoanIDs):
+    for LoanID in LoanIDs:
         try:
-            cmd = "SELECT fk_book_id FROM BooksInLoan WHERE fk_loan_id = ?;"
-            cur.execute(cmd,(loan_id,))
-            book_ids = cur.fetchall()
-            for i in book_ids:
-                cmd = "UPDATE Book SET is_loaned = 0 WHERE book_id = ?;"
+            cmd = "SELECT FKBookID FROM BooksInLoan WHERE FKLoanID = ?;"
+            cur.execute(cmd,(LoanID,))
+            BookIDs = cur.fetchall()
+            for i in BookIDs:
+                cmd = "UPDATE Book SET IsLoaned = 0 WHERE BookID = ?;"
                 cur.execute(cmd, i)
             
-            cmd = "DELETE FROM BooksInLoan WHERE fk_loan_id = ?;"
-            cur.execute(cmd, (loan_id,))
-            cmd = "DELETE FROM Loan WHERE loan_id = ?;"
-            cur.execute(cmd, (loan_id,))
+            cmd = "DELETE FROM BooksInLoan WHERE FKLoanID = ?;"
+            cur.execute(cmd, (LoanID,))
+            cmd = "DELETE FROM Loan WHERE LoanID = ?;"
+            cur.execute(cmd, (LoanID,))
             db.commit()
 
         except sq.OperationalError as e:
@@ -361,23 +358,25 @@ def returnLoans(loan_ids):
 def removeBook():
     print()
     searchParameter = input("Search parameter for deleting book: ")
-    bookcmd = f"SELECT * FROM Book WHERE title LIKE '%{searchParameter}%'"
+    bookcmd = f"SELECT * FROM Book WHERE Title LIKE '%{searchParameter}%'"
     books = cur.execute(bookcmd)
-    for book in books:
-        print(book)
-    print()
+    printTable()
+
     bookID = input("Give book id you want to delete: ")
     if bookID == "":
         print("Returning to menu.")
         return
-    book = cur.execute(f"SELECT title from Book WHERE book_id = {bookID}").fetchone()
+    book = cur.execute(f"SELECT Title from Book WHERE BookID = {bookID}").fetchone()
     userIn = input(f"Are you sure you want to delete {book} ")
     if userIn.capitalize() == "Y":
-        cmd = f"DELETE FROM Book WHERE book_id = {bookID}"
-        returnBooksOrLoans(bookID)
-        cur.execute(cmd)
-        print("Book deleted!")
-        db.commit()
+        if returnBooksOrLoans(bookID):
+            cmd = f"DELETE FROM Book WHERE BookID = {bookID}"
+        
+            cur.execute(cmd)
+            print("Book deleted!")
+            db.commit()
+        else:
+            print("Could not delete Book. Abort!")
     else:
         db.rollback()
     return
@@ -386,21 +385,20 @@ def removeBook():
 def removeMember():
     print()
     searchParameter = input("Give surname you want to search: ")
-    userscmd = f"SELECT * FROM Member WHERE last_name LIKE '%{searchParameter}%'"
+    userscmd = f"SELECT * FROM Member WHERE LastName LIKE '%{searchParameter}%'"
     users = cur.execute(userscmd)
-    for user in users.fetchall():
-        print(user)
-    print()
+    printTable()
+
     userID = input("Give user id you want to delete: ")
     if userID == "" or not userID.isnumeric():
         print("Returning to menu.")
         return
 
-    user = cur.execute(f"SELECT first_name,last_name from Member WHERE member_id = {userID}").fetchone()
+    user = cur.execute(f"SELECT FirstName,LastName from Member WHERE MemberID = {userID}").fetchone()
     userIn = input(f"Are you sure you want to delete {user} ")
     if userIn.capitalize() == "Y":
         if returnBooksOrLoans(userID):
-            cmd = f"DELETE FROM Member WHERE member_id = {userID}"
+            cmd = f"DELETE FROM Member WHERE MemberID = {userID}"
             cur.execute(cmd)
             print("User deleted!")
             print("User books returned.")
@@ -438,11 +436,8 @@ def listTableContent():
 
 
 def findBooks():
-    db.row_factory = sq.Row
-    cur2 = db.cursor()
     print()
-    print()
-    types = {"0":"title","1":"genre","2":"publisher","3":"released","4":"loaned"}
+    types = {"0":"Title","1":"genre","2":"publisher","3":"released","4":"loaned"}
     userIn1 = "11"
     while userIn1 not in types.keys():
         for c,i in enumerate(types):
@@ -451,8 +446,8 @@ def findBooks():
     userIn1 = types[userIn1]
     print()
     tempList = set()
-    if userIn1 not in ["title","loaned"]:
-        for i in cur2.execute(f"SELECT {userIn1} from BooksByTitle").fetchall():
+    if userIn1 not in ["Title","loaned"]:
+        for i in cur.execute(f"SELECT {userIn1} from BooksByTitle").fetchall():
             i = i[0]
             i = i.split(",")
             for j in i:
@@ -464,11 +459,12 @@ def findBooks():
         userIn2 = "1"
     else:
         userIn2 = input("Give search word: ")
-    booksByTitle = cur2.execute(f"Select * from BooksByTitle where {userIn1} like '%{userIn2}%'").fetchall()
-    print()
-    print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |\n{:s}".format("Title","Genre","Author","Publisher","Released","Loaned","-"*118))
-    for j in booksByTitle:
-        print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |".format(j["Title"][:30],j["Genre"][:24],j["Author"][:20],j["Publisher"],j["Released"][:10].replace("/","."),j["Loaned"]))
+    cur.execute(f"Select * from BooksByTitle where {userIn1} like '%{userIn2}%'")
+    printTable()
+    # print()
+    # print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |\n{:s}".format("Title","Genre","Author","Publisher","Released","Loaned","-"*118))
+    # for j in booksByTitle:
+    #     print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |".format(j["Title"][:30],j["Genre"][:24],j["Author"][:20],j["Publisher"],j["Released"][:10].replace("/","."),j["Loaned"]))
     return
 
 
@@ -511,18 +507,29 @@ def inputFromSQL():
 
 
 def deleteAuthor(): #69
-    print(cur.execute("SELECT * FROM booksinloan").fetchall())
-    cmd = f"DELETE FROM author WHERE author_id = 4000"
-    cur.execute(cmd)
-    print(cur.execute("SELECT * FROM booksinloan").fetchall())
-    # db.commit()
+    cur.execute("SELECT * FROM Book;")
+    printTable()
+
+    cur.execute("SELECT * FROM Author;")
+    printTable()
+    
+    a_id = input("Author ID: ")
+    cmd = f"DELETE FROM Author WHERE AuthorID = ?;"
+    cur.execute(cmd, (a_id,))
+    print("Author Deleted!")
+    cur.execute("SELECT * FROM Author;")
+    printTable()
+
+    cur.execute("SELECT * FROM Book;")
+    printTable()
+    
     return
 
 
 def modifyMember():
     cmd = ""
     opt = "-1"
-    user_id = findByID("Member", "member_id")
+    user_id = findByID("Member", "MemberID")
     if not user_id: return False
     while (opt != "0" or opt != ""):
         print("1: First name")
@@ -533,18 +540,18 @@ def modifyMember():
         opt = input("What to modify (0 or enter to exit): ")
         if opt == "" or opt == "0": return
         if opt == "1":
-            cmd = "UPDATE Member SET first_name = ? WHERE member_id = ?;"
+            cmd = "UPDATE Member SET FirstName = ? WHERE MemberID = ?;"
         elif opt == "2":
-            cmd = "UPDATE Member SET last_name = ? WHERE member_id = ?;"
+            cmd = "UPDATE Member SET LastName = ? WHERE MemberID = ?;"
         elif opt == "3":
-            cmd = "UPDATE Member SET address = ? WHERE member_id = ?;"
+            cmd = "UPDATE Member SET Address = ? WHERE MemberID = ?;"
         elif opt == "4":
-            cmd = "UPDATE Member SET phone_number = ? WHERE member_id = ?;"
+            cmd = "UPDATE Member SET PhoneNumber = ? WHERE MemberID = ?;"
         elif opt == "5":
-            cmd = "UPDATE Member SET email = ? WHERE member_id = ?;"
+            cmd = "UPDATE Member SET Email = ? WHERE MemberID = ?;"
         newData = input("New value: ")
         try:
-            cur.execute(cmd, (newData,userIn))
+            cur.execute(cmd, (newData,user_id))
         
         except sq.OperationalError as e:
             print("Could not modify data. Abort!")
@@ -564,7 +571,7 @@ def modifyMember():
 def modifyBook():
     cmd = ""
     opt = "-1"
-    user_id = findByID("Book", "book_id")
+    user_id = findByID("Book", "BookID")
     if not user_id: return False
     while (opt != "0" or opt != ""):
         print("1: Title")
@@ -573,15 +580,15 @@ def modifyBook():
         opt = input("What to modify (0 or enter to exit): ")
         if opt == "" or opt == "0": return
         if opt == "1":
-            cmd = "UPDATE Book SET title = ? WHERE book_id = ?;"
+            cmd = "UPDATE Book SET Title = ? WHERE BookID = ?;"
         elif opt == "2":
-            cmd = "UPDATE Book SET isbn = ? WHERE book_id = ?;"
+            cmd = "UPDATE Book SET ISBN = ? WHERE BookID = ?;"
         elif opt == "3":
-            cmd = "UPDATE Book SET publish_date = ? WHERE book_id = ?;"
+            cmd = "UPDATE Book SET PublishDate = ? WHERE BookID = ?;"
     
         newData = input("New value: ")
         try:
-            cur.execute(cmd, (newData,userIn))
+            cur.execute(cmd, (newData,user_id))
         
         except sq.OperationalError as e:
             print("Could not modify data. Abort!")
