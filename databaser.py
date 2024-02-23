@@ -492,7 +492,7 @@ def inputFromSQL():
     try:
         f = open(fName, "r")
         command = ""
-        addedData = []
+        # addedData = []
         # cur.executescript(f.read())  
         '''commented out works slower??? why?
         from index and optimization pdf there was Mass insert is always faster than multiple inserts
@@ -502,7 +502,7 @@ def inputFromSQL():
             if command.endswith(";\n") or command.endswith(";"):
                 try:
                     cur.execute(command)
-                    addedData.append(command)
+                    # addedData.append(command)
                 except sq.DatabaseError as x:
                     print(x ," Object was already in database. command was: ",command)
                     # print(addedData[-1])
@@ -528,8 +528,8 @@ def inputFromSQL():
         db.rollback()
         return
     print("This data is inputted.")
-    for i in addedData:
-        print(i,end="")
+    # for i in addedData:
+        # print(i,end="")
     print()
     if input("Are you sure you wanto to save this data? y/n: ").capitalize() == "Y":
         db.commit()
