@@ -1,28 +1,42 @@
 ## This program utilizes template python program given in the Week task Topic 6
 import sqlite3 as sq
 from datetime import datetime, timedelta
+import os
 
-db = sq.connect("prokkis.db")
-cur = db.cursor()
-cur.execute("PRAGMA foreign_keys = ON;")
+dbFile = "prokkis.db"
+dbInitFile = "DataBaseInit.sql"
+db = None
+cur = None
 
+def initConnection():
+    global db
+    global cur
+    db = sq.connect(dbFile)
+    cur = db.cursor()
+    cur.execute("PRAGMA foreign_keys = ON;")
+    return True
+    
 def initDB():
+    if os.path.isfile(dbFile):
+        initConnection()
+        return True
+    initConnection()
     try:
-        f = open("sqlcmds.sql", "r")
+        f = open(dbInitFile, "r")
         command = ""
         for l in f.readlines():
             command += l
         cur.executescript(command)
-
+        db.commit()
     except FileNotFoundError:
-        print("sqlcmd.sql file not found. Abort!")
-        print("Include sqlcmd.sql file in the same folder as databaser.py")
+        print(f"'{dbInitFile}' file not found. Abort!")
+        print(f"Include '{dbInitFile}' file in the same folder as databaser.py")
         return False
 
     except sq.Error as e:
-        print("Hmm, DB exists (hopefully)")
+        print("Hmm, something went sideways. Abort!")
         print(e)
-
+        return False
     return True
 
 
@@ -296,7 +310,7 @@ def returnBooksOrLoans(*args):
     
         for r in res:
             LoanIDs.append(r[0])
-        print(LoanIDs)
+        
 
 
     books_to_return = []
@@ -388,7 +402,7 @@ def removeBook():
 
 def removeMember():
     print()
-    searchParameter = input("Give surname you want to search: ")
+    searchParameter = input("Give last name you want to search: ")
     userscmd = f"SELECT * FROM Member WHERE LastName LIKE '%{searchParameter}%'"
     users = cur.execute(userscmd)
     printTable()
@@ -399,13 +413,12 @@ def removeMember():
         return
 
     user = cur.execute(f"SELECT FirstName,LastName from Member WHERE MemberID = {userID}").fetchone()
-    userIn = input(f"Are you sure you want to delete {user} ")
+    userIn = input(f"Are you sure you want to delete {user} (y/n): ")
     if userIn.capitalize() == "Y":
         if returnBooksOrLoans(userID):
-            cmd = f"DELETE FROM Member WHERE MemberID = {userID}"
+            cmd = f"DELETE FROM Member WHERE MemberID = {userID};"
             cur.execute(cmd)
             print("User deleted!")
-            print("User books returned.")
             db.commit()
         else:
             print("Could not delete user. Abort!")
@@ -625,9 +638,9 @@ def modifyBook():
     return True
 
 
-def main():
+def main():    
     if not initDB(): return -1
-
+    
     userIn = -1
     while(userIn != "0"):
         userIn = menu() 
