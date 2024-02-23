@@ -2193,7 +2193,7 @@ insert into Book (Title, ISBN, PublishDate) values ('Ainoat Oikeat', '1641289104
 insert into Book (Title, ISBN, PublishDate) values ('Doomsday Book', '0846107284', '02/06/2024');
 insert into Book (Title, ISBN, PublishDate) values ('Music of the Heart', '0605033335', '04/29/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Dangerous Game', '5214615171', '02/10/2024');
-insert into Book (Title, ISBN, PublishDate) values ('Christiane F. (a.k.a. We Children from Bahnhof Zoo) (Christiane F. - Wir Kinder vom Bahnhof Zoo)', '2371436300', '04/24/2023');
+-- insert into Book (Title, ISBN, PublishDate) values ('Christiane F. (a.k.a. We Children from Bahnhof Zoo) (Christiane F. - Wir Kinder vom Bahnhof Zoo)', '2371436300', '04/24/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Burn, Witch, Burn (Night of the Eagle)', '1291645836', '09/06/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Apocalypto', '0841948154', '07/21/2023');
 insert into Book (Title, ISBN, PublishDate) values ('They Live by Night', '0209203759', '12/21/2023');
@@ -2296,7 +2296,7 @@ insert into Book (Title, ISBN, PublishDate) values ('Sleeping Beauty', '03618443
 insert into Book (Title, ISBN, PublishDate) values ('Three (Tri)', '2640869418', '08/23/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Angry Video Game Nerd: The Movie', '9713465406', '08/10/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Funeral, The', '5136095573', '02/19/2024');
-insert into Book (Title, ISBN, PublishDate) values ('Henry IV, Part I (First Part of King Henry the Fourth, with the Life and Death of Henry Surnamed Hotspur, The)', '9086898233', '06/17/2023');
+-- insert into Book (Title, ISBN, PublishDate) values ('Henry IV, Part I (First Part of King Henry the Fourth, with the Life and Death of Henry Surnamed Hotspur, The)', '9086898233', '06/17/2023');
 insert into Book (Title, ISBN, PublishDate) values ('A Walk in the Woods', '0370618624', '05/01/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Kidnapping of the President, The', '7724179056', '11/11/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Machine Gun Preacher', '4261070724', '09/25/2023');
@@ -3643,7 +3643,7 @@ insert into Book (Title, ISBN, PublishDate) values ('Hour of the Pig, The', '968
 insert into Book (Title, ISBN, PublishDate) values ('Hitting Home', '5956151788', '05/10/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Goya: Crazy Like a Genius', '7274083581', '10/18/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Chasing Beauty', '4160790132', '03/02/2023');
-insert into Book (Title, ISBN, PublishDate) values ('Revolutionary Girl Utena: Adolescence of Utena (a.k.a. Revolutionary Girl Utena the Movie) (Shoujo kakumei Utena: Adolescence mokushiroku)', '7191997568', '09/10/2023');
+-- insert into Book (Title, ISBN, PublishDate) values ('Revolutionary Girl Utena: Adolescence of Utena (a.k.a. Revolutionary Girl Utena the Movie) (Shoujo kakumei Utena: Adolescence mokushiroku)', '7191997568', '09/10/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Paycheck', '7689335260', '10/08/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Big River Man', '3772250780', '03/20/2023');
 insert into Book (Title, ISBN, PublishDate) values ('El tren de la memoria', '5901252457', '02/26/2023');
@@ -4278,7 +4278,7 @@ insert into Book (Title, ISBN, PublishDate) values ('California Solo', '97870075
 insert into Book (Title, ISBN, PublishDate) values ('Promise Me This (Zavet)', '5482568057', '05/25/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Bomber', '0010404531', '02/17/2024');
 insert into Book (Title, ISBN, PublishDate) values ('Wind and the Lion, The', '8762697026', '07/10/2023');
-insert into Book (Title, ISBN, PublishDate) values ('Dragon Ball Z: Broly - The Legendary Super Saiyan (Doragon bôru Z 8: Moetsukiro!! Nessen retsusen-chô gekisen)', '4110811371', '05/29/2023');
+-- insert into Book (Title, ISBN, PublishDate) values ('Dragon Ball Z: Broly - The Legendary Super Saiyan (Doragon bôru Z 8: Moetsukiro!! Nessen retsusen-chô gekisen)', '4110811371', '05/29/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Call of Cthulhu, The', '4163531543', '03/21/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Closing the Ring', '5184664833', '04/05/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Painting Sellers, The (Taulukauppiaat)', '9791646742', '10/07/2023');
@@ -4611,7 +4611,7 @@ insert into Book (Title, ISBN, PublishDate) values ('Rhyme & Reason', '494752236
 insert into Book (Title, ISBN, PublishDate) values ('Kick-Ass', '6866482725', '09/15/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Time Bandits', '5473710775', '05/08/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Deadgirl', '6198059190', '05/10/2023');
-insert into Book (Title, ISBN, PublishDate) values ('Friend Is a Treasure, A (Chi Trova Un Amico, Trova un Tesoro) (Who Finds a Friend Finds a Treasure)', '3680303351', '02/04/2024');
+-- insert into Book (Title, ISBN, PublishDate) values ('Friend Is a Treasure, A (Chi Trova Un Amico, Trova un Tesoro) (Who Finds a Friend Finds a Treasure)', '3680303351', '02/04/2024');
 insert into Book (Title, ISBN, PublishDate) values ('North', '1449577092', '01/20/2024');
 insert into Book (Title, ISBN, PublishDate) values ('Raspberry Boat Refugee', '0902630813', '04/30/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Rockin'' in the Rockies', '7238418744', '12/09/2023');
