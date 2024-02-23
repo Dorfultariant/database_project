@@ -8,11 +8,15 @@ cur.execute("PRAGMA foreign_keys = ON;")
 
 def initDB():
     try:
-        f = open("sqlcmds.sql", "r")
+        f = open("sqlcmd.sql", "r")
         command = ""
         for l in f.readlines():
-            command += l
-        cur.executescript(command)
+            try:
+                cur.execute(l)
+                db.commit()
+            except sq.OperationalError as e:
+                print(e)
+        # cur.executescript(command)
 
     except FileNotFoundError:
         print("sqlcmd.sql file not found. Abort!")
