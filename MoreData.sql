@@ -3015,8 +3015,8 @@ insert into Book (Title, ISBN, PublishDate) values ('La Morte Rouge', '765469166
 insert into Book (Title, ISBN, PublishDate) values ('Return of the Musketeers, The', '5451387642', '07/15/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Mohabbatein', '4769042293', '11/09/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Very Social Secretary, A', '6590742620', '11/23/2023');
-insert into Book (Title, ISBN, PublishDate) values ('Three Brothers 2, The (Les trois frères, le retour)', '8373054054', '08/22/2023');
-insert into Book (Title, ISBN, PublishDate) values ('Geographer Drank His Globe Away', '8015981807', '01/26/2024');
+insert into Book (Title, ISBN, PublishDate) values ('Three Brothers 2, The (Les trois frères, le re
+>>>>>>> bbb0003d1f8fdf758913998a45d3ba27e86e41bc, '01/26/2024');
 insert into Book (Title, ISBN, PublishDate) values ('American Madness', '6919033439', '11/28/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Bakeneko: A Vengeful Spirit', '2545946704', '09/24/2023');
 insert into Book (Title, ISBN, PublishDate) values ('Weekender', '5794410987', '06/22/2023');
