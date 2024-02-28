@@ -3,4 +3,5 @@ tables.sql
 lib_tables.sql
 *.db
 *.docx
+view.sql
 *.erdplus

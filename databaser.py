@@ -15,7 +15,8 @@ def initConnection():
     cur = db.cursor()
     cur.execute("PRAGMA foreign_keys = ON;")
     return True
-    
+
+
 def initDB():
     if os.path.isfile(dbFile):
         initConnection()
@@ -69,7 +70,7 @@ def menu():
 
 def insertBook():
     print("You want to insert book? Nice!")
-    Title =         input("Book name?: ")
+    Title = input("Book name?: ")
     genres = set()
  
     genreInput = 1
@@ -86,13 +87,13 @@ def insertBook():
             genreInput = int(genreInput)-1
             genres.add(dbgenres[genreInput][0])
         
-
-    print(genres)
-    ISBN = input("ISBN?: ")
-    if (len(ISBN) != 10 and len(ISBN) != 13):
-        input("ISBN number was incorrect. Press enter to return menu.")
-        return
-    publishDate = input("publish date? MM/DD/YYYY: ")
+    ISBN = input("Give 10 or 13 long ISBN: ")
+    while (1):
+        if (len(ISBN) != 10 and len(ISBN) != 13):
+            ISBN = input("ISBN was too short. Give 10 or 13 long ISBN: ")
+            continue
+        break
+    publishDate = input("Publish date? MM/DD/YYYY: ")
     AuthorFirstName = input("Author firstname: ")
     AuthorLastName = input("Author lastname: ")
     publisher = input("Publisher: ")
@@ -103,7 +104,7 @@ def insertBook():
     row = authorData.fetchone()
     if row != None:
         authorID = row[0]
-        print("AuthorID:",authorID)
+        print("AuthorID: ",authorID)
     else:
         print("Author is not in database.")
         Nationality = input("Give Nationality for author: ")
@@ -112,7 +113,6 @@ def insertBook():
         cur.execute(f"SELECT * from Author where AuthorFirstName = '{AuthorFirstName}' AND AuthorLastName = '{AuthorLastName}'")
         authorData = cur.fetchone()
         authorID = authorData[0]
-        # print(cur.fetchone())
 
     
     cmd = f"SELECT * FROM Publisher WHERE PublisherName = '{publisher}'"
@@ -123,16 +123,20 @@ def insertBook():
         print("publisherID:",publisherID)
     else:
         print("Publisher is not in database.")
-        print("Give adress for publisher: ",end="")
-        Address = input()
-        print("Give e-mail for publisher: ",end="")
-        Email = input()
-        cmd = f"INSERT INTO Publisher (PublisherName,Address,Email) VALUES ('{publisher}','{Address}','{Email}')"
-        cur.execute(cmd)
-        cur.execute(f"SELECT * from publisher where PublisherName = '{publisher}'")
-        publisherData = cur.fetchone()
-        publisherID = publisherData[0]
-
+        Address = input("Give address for publisher: ")
+        Email = input("Give e-mail for publisher: ")
+        while (Address == "" or Email == ""):
+            print("Required Information:")
+            if Address == "": Address = input("Give address for publisher: ")
+            if Email == "": Email = input("Give e-mail for publisher: ")
+        try:
+            cmd = f"INSERT INTO Publisher (PublisherName,Address,Email) VALUES ('{publisher}','{Address}','{Email}')"
+            cur.execute(cmd)
+            cur.execute(f"SELECT * from publisher where PublisherName = '{publisher}'")
+            publisherData = cur.fetchone()
+            publisherID = publisherData[0]
+        except sq.OperationalError as e:
+            print(e)
     print()
     cmd = f"INSERT INTO book (Title, ISBN, PublishDate,FKAuthorID,FKPublisherID) VALUES ('{Title}','{ISBN}','{publishDate}',{authorID},{publisherID})"
     cur.execute(cmd)   
@@ -435,6 +439,7 @@ def listTableContent():
     print("3: List Publishers")
     print("4: List Genres")
     print("5: List Members")
+    print("6: List Loans")
     userIn = input("Option (0 or enter to exit): ")
     if userIn == "" or userIn == "0": return
     if (userIn == "1"):
@@ -447,6 +452,8 @@ def listTableContent():
         printTable("Genre")
     elif (userIn == "5"):
         printTable("Member")
+    elif (userIn == "6"):
+        printTable("Loan")
     else:
         print("Invalid input,")
     return
@@ -480,10 +487,6 @@ def findBooks():
         userIn2 = input("Give search word: ")
     cur.execute(f"Select * from BooksByTitle where {userIn1} like '%{userIn2}%'")
     printTable()
-    # print()
-    # print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |\n{:s}".format("Title","Genre","Author","Publisher","Released","Loaned","-"*118))
-    # for j in booksByTitle:
-    #     print("|{:30} |{:24} |{:20} |{:15} |{:>10} |{:6} |".format(j["Title"][:30],j["Genre"][:24],j["Author"][:20],j["Publisher"],j["Released"][:10].replace("/","."),j["Loaned"]))
     return
 
 
@@ -684,3 +687,5 @@ def main():
     return 0
 
 main()
+
+
