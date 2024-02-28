@@ -24,8 +24,8 @@ create table Book (
         IsLoaned BOOL NOT NULL DEFAULT FALSE,
         FKAuthorID INTEGER,
         FKPublisherID INTEGER,
-        FOREIGN KEY (FKAuthorID) REFERENCES Author(AuthorID) ON DELETE CASCADE,
-        FOREIGN KEY (FKPublisherID) REFERENCES Publisher(PublisherID) ON DELETE CASCADE
+        FOREIGN KEY (FKAuthorID) REFERENCES Author(AuthorID) ON DELETE SET NULL,
+        FOREIGN KEY (FKPublisherID) REFERENCES Publisher(PublisherID) ON DELETE SET NULL
 );
 
 create table BooksInLoan (
@@ -37,7 +37,7 @@ create table BooksInLoan (
 
 create table Genre (
         GenreID INTEGER PRIMARY KEY NOT NULL,
-        GenreName VARCHAR(20) NOT NULL
+        GenreName VARCHAR(20) NOT NULL UNIQUE
 );
 
 create table GenresOfBook (
@@ -87,6 +87,7 @@ create view BooksByTitle as
         left join genre on genre.GenreID = GenresOfBook.FKGenreID
         group By book.Title
         order by book.title;
+
 -- MemberID is used often to find target members
 CREATE INDEX MemberIDX ON Member(MemberID);
 CREATE INDEX FKMemberIDX ON Loan(FKMemberID);
@@ -114,7 +115,6 @@ insert into Member (MemberID, FirstName, LastName, Address, PhoneNumber, Email) 
 insert into Member (MemberID, FirstName, LastName, Address, PhoneNumber, Email) values (1018,'Zachery', 'Percifull' , '00 Acker Court', '367-337-4336'              , 'zpercifulli@army.mil');
 insert into Member (MemberID, FirstName, LastName, Address, PhoneNumber, Email) values (1019,'Alyse', 'Cornfoot'    , '0 Northview Center', '648-288-6657'          , 'acornfootj@buzzfeed.com');
 
-
 insert into Genre (GenreID, GenreName) values (3000   ,'Comedy');
 insert into Genre (GenreID, GenreName) values (3001   ,'Action');
 insert into Genre (GenreID, GenreName) values (3002   ,'Drama');
@@ -137,12 +137,14 @@ insert into Author (AuthorID, AuthorFirstName, AuthorLastName, Nationality) valu
 insert into Author (AuthorID, AuthorFirstName, AuthorLastName, Nationality) values (4008, 'Munroe', 'Formby'          , 'Sweden');
 insert into Author (AuthorID, AuthorFirstName, AuthorLastName, Nationality) values (4009, 'Sidonnie', 'Langan'        , 'Japan');
 
+
 insert into Publisher (PublisherID, PublisherName, Address, Email) values (5000, 'Gevee', '4 Everett Street'          , 'tcaldecourt0@ca.gov');
 insert into Publisher (PublisherID, PublisherName, Address, Email) values (5001, 'Dablist', '32 Susan Avenue'         , 'edominguez1@taobao.com');
 insert into Publisher (PublisherID, PublisherName, Address, Email) values (5002, 'Jetpulse', '9084 Marcy Terrace'     , 'tdickin2@google.com.br');
 insert into Publisher (PublisherID, PublisherName, Address, Email) values (5003, 'Divanoodle', '714 Sullivan Plaza'   , 'bgeratasch3@jigsy.com');
 insert into Publisher (PublisherID, PublisherName, Address, Email) values (5004, 'Mynte', '68538 Garrison Circle'     , 'sewence4@rambler.su');
 insert into Publisher (PublisherID, PublisherName, Address, Email) values (5005, 'Testi', '68538 Garrison Circle'     , 'sewence2@rambler.su');
+
 
 insert into Loan (LoanID, LoanDate, DueDate, FKMemberID) values (6000, '11/25/3153', '5/11/4111'   , 1000  );
 insert into Loan (LoanID, LoanDate, DueDate, FKMemberID) values (6001, '6/22/4246' , '11/29/4815'   , 1000  );
@@ -154,6 +156,7 @@ insert into Loan (LoanID, LoanDate, DueDate, FKMemberID) values (6006, '5/2/3282
 insert into Loan (LoanID, LoanDate, DueDate, FKMemberID) values (6007, '9/24/7006' , '7/20/3240'   , 1003  );
 insert into Loan (LoanID, LoanDate, DueDate, FKMemberID) values (6008, '1/28/7512' , '4/3/4044'     , 1002  );
 insert into Loan (LoanID, LoanDate, DueDate, FKMemberID) values (6009, '12/24/6899', '4/14/8836'   , 1001  );
+
 
 insert into Book (BookID, Title, ISBN, PublishDate, IsLoaned, FKAuthorID, FKPublisherID) values (2000,  'The Item'         , '9513807274'  , '7/15/1996'   , 1 , 4000, 5001 );
 insert into Book (BookID, Title, ISBN, PublishDate, IsLoaned, FKAuthorID, FKPublisherID) values (2001,  'Style Wars'        , '3788792957'  , '2/21/2078'   , 1 , 4000, 5001 );
@@ -197,6 +200,7 @@ insert into GenresOfBook (FKBookID, FKGenreID) values (2008, 3001);
 insert into GenresOfBook (FKBookID, FKGenreID) values (2008, 3007);
 insert into GenresOfBook (FKBookID, FKGenreID) values (2009, 3009);
 
+
 insert into GenresOfBook (FKBookID, FKGenreID) values (2010, 3002);
 insert into GenresOfBook (FKBookID, FKGenreID) values (2011, 3002);
 insert into GenresOfBook (FKBookID, FKGenreID) values (2012, 3001);
@@ -211,6 +215,7 @@ insert into GenresOfBook (FKBookID, FKGenreID) values (2019, 3005);
 insert into GenresOfBook (FKBookID, FKGenreID) values (2019, 3002);
 insert into GenresOfBook (FKBookID, FKGenreID) values (2019, 3001);
 insert into GenresOfBook (FKBookID, FKGenreID) values (2018, 3007);
+
 
 insert into BooksInLoan (FKBookID, FKLoanID) values (2000, 6000);
 insert into BooksInLoan (FKBookID, FKLoanID) values (2001, 6000);
