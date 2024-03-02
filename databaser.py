@@ -235,8 +235,8 @@ def loanBook():
 
     bookIn = input("Loan Book by Title (0 or enter to exit): ")
     while (bookIn != "0" and bookIn != ""):
-        cmd = f"SELECT * FROM Book WHERE Title = ? AND IsLoaned = 0;"
-        cur.execute(cmd, (bookIn,))
+        cmd = f"SELECT * FROM Book WHERE Title LIKE '%{bookIn}%' AND IsLoaned = 0;"
+        cur.execute(cmd)
         book = cur.fetchone()
         if book:
             BookID = book[0]
