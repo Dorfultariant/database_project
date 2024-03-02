@@ -1,2 +1,2 @@
-insert into Member (first_name, last_name, address, phone_number, email) values ('Vili', 'Jokela', 'Joosepintie 9', '040 700 9252', 'vili.jokela@SUS.fi');
+insert into Member (first_name, last_name, address, phone_number, email) values ('Vili', 'Jokela', 'Jouseppan 96', '0700 321 321', 'vili.jokela@SUS.fi');
 insert into Member (first_name, last_name, address, phone_number, email) values ('Teemu', 'Hiltunen', 'Slahti 69', '0700 123 123', 'teemu.hiltunen@SUS.fi');
