@@ -1,10 +1,10 @@
 create table Member (
         MemberID INTEGER PRIMARY KEY NOT NULL,
-        FirstName VARCHAR(10) NOT NULL,
-        LastName VARCHAR(15) NOT NULL,
-        Address VARCHAR(30) NOT NULL,
+        FirstName VARCHAR(20) NOT NULL,
+        LastName VARCHAR(20) NOT NULL,
+        Address VARCHAR(50) NOT NULL,
         PhoneNumber VARCHAR(10) UNIQUE NOT NULL,
-        Email VARCHAR(25) UNIQUE
+        Email VARCHAR(50) UNIQUE
 );
 
 create table Loan (
@@ -18,7 +18,7 @@ create table Loan (
 
 create table Book (
         BookID INTEGER PRIMARY KEY NOT NULL,
-        Title VARCHAR(20) NOT NULL,
+        Title VARCHAR(50) NOT NULL,
         ISBN VARCHAR(13) NOT NULL CHECK(LENGTH(ISBN) IN (10, 13)),
         PublishDate VARCHAR(12),
         IsLoaned BOOL NOT NULL DEFAULT FALSE,
@@ -49,16 +49,16 @@ create table GenresOfBook (
 
 create table Author (
         AuthorID INTEGER PRIMARY KEY NOT NULL,
-        AuthorFirstName VARCHAR(10),
-        AuthorLastName VARCHAR(15),
+        AuthorFirstName VARCHAR(20),
+        AuthorLastName VARCHAR(20),
         Nationality VARCHAR(15)
 );
 
 create table Publisher (
         PublisherID INTEGER PRIMARY KEY NOT NULL,
         PublisherName VARCHAR(20) UNIQUE,
-        Address VARCHAR(30),
-        Email VARCHAR(25) UNIQUE
+        Address VARCHAR(50),
+        Email VARCHAR(50) UNIQUE
 );
 
 create view LoanView as
