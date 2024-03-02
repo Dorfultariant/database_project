@@ -77,13 +77,13 @@ def insertBook():
     dbgenres = cur.execute("SELECT * FROM Genre")
     dbgenres = dbgenres.fetchall()
 
-    while genreInput != "0":
+    while genreInput != "0":                # user input genres while it inputs 0
         print()
-        for c,i in enumerate(dbgenres):
+        for c,i in enumerate(dbgenres):     # prints genres
             print(f"{c+1}:",i[1])
         print("To stop insert 0")
         genreInput = input("Insert genre number: ")
-        if genreInput.isdigit() and int(genreInput) <= len(dbgenres) and int(genreInput) > 0:
+        if genreInput.isdigit() and int(genreInput) <= len(dbgenres) and int(genreInput) > 0:   # user correct genre selection check
             genreInput = int(genreInput)-1
             genres.add(dbgenres[genreInput][0])
         
@@ -490,8 +490,12 @@ def findBooks():
     return
 
 
-def inputFromSQL():
-    fName = input("Give sql filename: ")
+def inputFromSQL(*args):
+    if not args:
+        fName = input("Give sql filename: ")
+    else:
+        fName = args[0]
+        
     try:
         f = open(fName, "r")
         command = ""
@@ -530,7 +534,7 @@ def inputFromSQL():
         print("something went wrong. Rolling back.")
         db.rollback()
         return
-    print("This data is inputted.")
+    # print("This data is inputted.")
     # for i in addedData:
         # print(i,end="")
     print()
@@ -543,7 +547,7 @@ def inputFromSQL():
     return
 
 
-def deleteAuthor(): #69
+def testfunction(): #69
     cur.execute("SELECT * FROM Book;")
     printTable()
 
@@ -643,7 +647,19 @@ def modifyBook():
 
 def main():    
     if not initDB(): return -1
-    
+    #--------------------- Checks is the database empty. if empty asks if you want to input demodata.
+    primeTables = ["Member","Loan","Book","Author","Publisher"]
+    data = []
+    for i in primeTables:
+        cur.execute(f"SELECT * FROM {i}")
+        row = cur.fetchone()
+        if row:
+            data.append(row)
+    if len(data) == 0:
+        userIn = input("Database is empty. Do you want to input demo data from DemoData.slq file y/n: ")
+        if userIn.capitalize() == "Y":
+            inputFromSQL("DemoData.sql")
+    #---------------------- Database check end
     userIn = -1
     while(userIn != "0"):
         userIn = menu() 
@@ -672,8 +688,8 @@ def main():
             removeMember()
         elif (userIn == "12"):
             inputFromSQL()
-        elif (userIn == "69"):
-            deleteAuthor()
+        # elif (userIn == "69"):    # for test purposes
+            # testfunction()
         elif (userIn == "0"):
             continue
         else:
